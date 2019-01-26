@@ -18,6 +18,19 @@ const (
 
 const stockPriceURLTemplate string = "https://tw.quote.finance.yahoo.net/quote/q?type=ta&perd=%v&mkt=10&sym=%v"
 
+// GetStockInfoFromWeb will return StockPriceInfo which download from yahoo stock web
+func GetStockInfoFromWeb(stockID uint, period pricePeriod) (StockPriceInfo, error) {
+	rawData, err := downloadStockPrice(stockID, period)
+	if err != nil {
+		return StockPriceInfo{}, err
+	}
+	stockInfo, err := parseStockPriceJSON(rawData)
+	if err != nil {
+		return StockPriceInfo{}, err
+	}
+	return stockInfo, nil
+}
+
 func downloadStockPrice(stockID uint, period pricePeriod) (string, error) {
 	timeoutRequest := http.Client{Timeout: time.Minute * 5}
 	url := fmt.Sprintf(stockPriceURLTemplate, period, stockID)
@@ -47,20 +60,21 @@ type stockMemo struct {
 	Name string `json:"name"`
 }
 
-type stockPriceInfo struct {
+// StockPriceInfo contain stock price information which are daily or monthly
+type StockPriceInfo struct {
 	ID        string      `json:"id"`
 	Period    string      `json:"perd"`
 	Mem       stockMemo   `json:"mem"`
 	PriceInfo []dailyInfo `json:"ta"`
 }
 
-func parseStockPriceJSON(rawData string) (stockPriceInfo, error) {
+func parseStockPriceJSON(rawData string) (StockPriceInfo, error) {
 	re := regexp.MustCompile("{.*}")
 	jsonStr := re.FindString(rawData)
-	var jsonData stockPriceInfo
+	var jsonData StockPriceInfo
 	err := json.Unmarshal([]byte(jsonStr), &jsonData)
 	if err != nil {
-		return stockPriceInfo{}, err
+		return StockPriceInfo{}, err
 	}
 	return jsonData, nil
 }
