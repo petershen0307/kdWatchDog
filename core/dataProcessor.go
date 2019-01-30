@@ -14,6 +14,7 @@ type pricePeriod string
 const (
 	monthPricePeriod pricePeriod = "m"
 	dailyPricePeriod pricePeriod = "d"
+	weekPricePeriod  pricePeriod = "w"
 )
 
 const stockPriceURLTemplate string = "https://tw.quote.finance.yahoo.net/quote/q?type=ta&perd=%v&mkt=10&sym=%v"
@@ -63,7 +64,7 @@ type stockMemo struct {
 // StockPriceInfo contain stock price information which are daily or monthly
 type StockPriceInfo struct {
 	ID        string      `json:"id"`
-	Period    string      `json:"perd"`
+	Period    pricePeriod `json:"perd"`
 	Mem       stockMemo   `json:"mem"`
 	PriceInfo []dailyInfo `json:"ta"`
 }
