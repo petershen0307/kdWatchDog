@@ -30,13 +30,18 @@ func minMaxIntSlice(slice interface{}, minMax func(element reflect.Value, min, m
 }
 
 // return min, max
-func minMaxFloatSlice(slice interface{}, minMax func(element reflect.Value, min, max float64) (float64, float64)) (float64, float64) {
-	min := math.MaxFloat64 // give float64 max value
-	max := float64(0)      // give 0
+func minMaxFloatSlice(slice interface{}, getValue func(element reflect.Value) float64) (float64, float64) {
+	min := float64(0)
+	max := float64(0)
 	rv := reflect.ValueOf(slice)
 	length := rv.Len()
 	for i := 0; i < length; i++ {
-		min, max = minMax(rv.Index(i), min, max)
+		value := getValue(rv.Index(i))
+		if 0 == i {
+			min, max = value, value
+		}
+		min = math.Min(value, min)
+		max = math.Max(value, max)
 	}
 	return min, max
 }
@@ -45,4 +50,6 @@ func kdCalculator(stockDailyInfo []dailyInfo, n uint) {
 	sort.Slice(stockDailyInfo, func(i, j int) bool {
 		return stockDailyInfo[i].Date < stockDailyInfo[j].Date
 	})
+	// 找最高跟最低的收盤價, 在近n天
+	//minMaxFloatSlice(stockDailyInfo)
 }

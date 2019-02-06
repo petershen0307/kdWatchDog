@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"reflect"
 	"testing"
 )
@@ -67,25 +66,21 @@ func Test_minMaxFloatSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 	for i, test := range testTable {
 		t.Run(fmt.Sprintf("test: %v", i+1), func(t *testing.T) {
 			min, max := minMaxFloatSlice(test.slice,
-				func(element reflect.Value, min, max float64) (float64, float64) {
-					rMin := min
-					rMax := max
-					compareValue := float64(0)
+				func(element reflect.Value) float64 {
+					r := float64(0)
 					switch element.Type().Name() {
 					case "float64":
-						rv, ok := element.Interface().(float64)
+						v, ok := element.Interface().(float64)
 						if ok {
-							compareValue = rv
+							r = v
 						}
 					case "dailyInfo":
-						rv, ok := element.Interface().(dailyInfo)
+						v, ok := element.Interface().(dailyInfo)
 						if ok {
-							compareValue = rv.HighPrice
+							r = v.HighPrice
 						}
 					}
-					rMax = math.Max(compareValue, max)
-					rMin = math.Min(compareValue, min)
-					return rMin, rMax
+					return r
 				})
 			if min != test.expectMin || max != test.expectMax {
 				t.Errorf("\nInput slice:%v\nGot min:(%v) expect min:(%v)\nGot max:(%v) expect max:(%v)", test.slice, min, test.expectMin, max, test.expectMax)
