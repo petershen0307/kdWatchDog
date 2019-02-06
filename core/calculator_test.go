@@ -13,6 +13,7 @@ func Test_minMaxIntSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 		expectMax uint
 	}{
 		{[]uint{1, 2, 3, 4, 5}, 1, 5},
+		{[]dailyInfo{{Date: 1}, {Date: 2}, {Date: 3}, {Date: 4}, {Date: 5}}, 1, 5},
 	}
 
 	for i, test := range testTable {
@@ -30,6 +31,16 @@ func Test_minMaxIntSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 							}
 							if rv > max {
 								rMax = tMax(rv)
+							}
+						}
+					case "dailyInfo":
+						rv, ok := element.Interface().(dailyInfo)
+						if ok {
+							if rv.Date < min {
+								rMin = tMin(rv.Date)
+							}
+							if rv.Date > max {
+								rMax = tMax(rv.Date)
 							}
 						}
 					}
