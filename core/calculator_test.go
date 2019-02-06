@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -47,6 +48,46 @@ func Test_minMaxIntSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 					return rMin, rMax
 				})
 			if uint(min) != test.expectMin || uint(max) != test.expectMax {
+				t.Errorf("\nInput slice:%v\nGot min:(%v) expect min:(%v)\nGot max:(%v) expect max:(%v)", test.slice, min, test.expectMin, max, test.expectMax)
+			}
+		})
+	}
+}
+
+func Test_minMaxFloatSlice_WhenCall_GetMinMaxValue(t *testing.T) {
+	testTable := []struct {
+		slice     interface{}
+		expectMin float64
+		expectMax float64
+	}{
+		{[]float64{1.1, 2.1, 3.1, 4.1, 5.1}, 1.1, 5.1},
+		{[]dailyInfo{{HighPrice: 1.1}, {HighPrice: 2.1}, {HighPrice: 3.1}, {HighPrice: 4.1}, {HighPrice: 5.1}}, 1.1, 5.1},
+	}
+
+	for i, test := range testTable {
+		t.Run(fmt.Sprintf("test: %v", i+1), func(t *testing.T) {
+			min, max := minMaxFloatSlice(test.slice,
+				func(element reflect.Value, min, max float64) (float64, float64) {
+					rMin := min
+					rMax := max
+					compareValue := float64(0)
+					switch element.Type().Name() {
+					case "float64":
+						rv, ok := element.Interface().(float64)
+						if ok {
+							compareValue = rv
+						}
+					case "dailyInfo":
+						rv, ok := element.Interface().(dailyInfo)
+						if ok {
+							compareValue = rv.HighPrice
+						}
+					}
+					rMax = math.Max(compareValue, max)
+					rMin = math.Min(compareValue, min)
+					return rMin, rMax
+				})
+			if min != test.expectMin || max != test.expectMax {
 				t.Errorf("\nInput slice:%v\nGot min:(%v) expect min:(%v)\nGot max:(%v) expect max:(%v)", test.slice, min, test.expectMin, max, test.expectMax)
 			}
 		})

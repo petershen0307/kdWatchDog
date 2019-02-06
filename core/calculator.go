@@ -1,12 +1,22 @@
 package core
 
 import (
+	"math"
 	"reflect"
 	"sort"
 )
 
 type tMin uint
 type tMax uint
+
+type kdResult struct {
+	Date       uint
+	NHighPrice float64
+	NLowPrice  float64
+	RSV        float64
+	K          float64
+	D          float64
+}
 
 func minMaxIntSlice(slice interface{}, minMax func(element reflect.Value, min, max uint) (tMin, tMax)) (tMin, tMax) {
 	min := tMin(^uint(0)) // give uint max value
@@ -15,6 +25,18 @@ func minMaxIntSlice(slice interface{}, minMax func(element reflect.Value, min, m
 	length := rv.Len()
 	for i := 0; i < length; i++ {
 		min, max = minMax(rv.Index(i), uint(min), uint(max))
+	}
+	return min, max
+}
+
+// return min, max
+func minMaxFloatSlice(slice interface{}, minMax func(element reflect.Value, min, max float64) (float64, float64)) (float64, float64) {
+	min := math.MaxFloat64 // give float64 max value
+	max := float64(0)      // give 0
+	rv := reflect.ValueOf(slice)
+	length := rv.Len()
+	for i := 0; i < length; i++ {
+		min, max = minMax(rv.Index(i), min, max)
 	}
 	return min, max
 }
