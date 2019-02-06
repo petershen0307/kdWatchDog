@@ -5,16 +5,16 @@ import (
 	"sort"
 )
 
-type tMin int
-type tMax int
+type tMin uint
+type tMax uint
 
-func minMaxIntSlice(slice interface{}, minMax func(element reflect.Value, min, max int) (tMin, tMax)) (tMin, tMax) {
-	min := tMin(int((^uint(0)) >> 1))         // give int max value
-	max := tMax(int(-int((^uint(0))>>1) - 1)) // give int min value
+func minMaxIntSlice(slice interface{}, minMax func(element reflect.Value, min, max uint) (tMin, tMax)) (tMin, tMax) {
+	min := tMin(^uint(0)) // give uint max value
+	max := tMax(0)        // give uint min value
 	rv := reflect.ValueOf(slice)
 	length := rv.Len()
 	for i := 0; i < length; i++ {
-		min, max = minMax(rv.Index(i), int(min), int(max))
+		min, max = minMax(rv.Index(i), uint(min), uint(max))
 	}
 	return min, max
 }
