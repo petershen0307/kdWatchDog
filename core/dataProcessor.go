@@ -55,7 +55,6 @@ type dailyInfo struct {
 	LowPrice   float32 `json:"l"`
 	ClosePrice float32 `json:"c"`
 	Volume     uint    `json:"v"`
-	KDValue    float32
 }
 type stockMemo struct {
 	ID   string `json:"id"`
