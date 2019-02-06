@@ -50,10 +50,10 @@ func downloadStockPrice(stockID uint, period pricePeriod) (string, error) {
 
 type dailyInfo struct {
 	Date       uint    `json:"t"`
-	OpenPrice  float32 `json:"o"`
-	HighPrice  float32 `json:"h"`
-	LowPrice   float32 `json:"l"`
-	ClosePrice float32 `json:"c"`
+	OpenPrice  float64 `json:"o"`
+	HighPrice  float64 `json:"h"`
+	LowPrice   float64 `json:"l"`
+	ClosePrice float64 `json:"c"`
 	Volume     uint    `json:"v"`
 }
 type stockMemo struct {
