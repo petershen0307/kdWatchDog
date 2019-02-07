@@ -11,6 +11,7 @@ type tMax uint
 
 type kdResult struct {
 	Date       uint
+	ClosePrice float64
 	NHighPrice float64
 	NLowPrice  float64
 	RSV        float64
@@ -55,7 +56,8 @@ func kdCalculator(stockDailyInfo []dailyInfo, n int) []kdResult {
 	for i, v := range stockDailyInfo {
 		// index start from 0
 		if i < n-1 {
-			result = append(result, kdResult{Date: v.Date, K: 50, D: 50})
+			// go default float value is 0
+			result = append(result, kdResult{Date: v.Date, ClosePrice: v.ClosePrice, K: 50, D: 50})
 			continue
 		}
 		// n days high low price
@@ -69,7 +71,7 @@ func kdCalculator(stockDailyInfo []dailyInfo, n int) []kdResult {
 		rsv := float64(100) * (v.ClosePrice - min) / (max - min)
 		k := (float64(1)/3)*rsv + (float64(2)/3)*result[i-1].K
 		d := (float64(1)/3)*k + (float64(2)/3)*result[i-1].D
-		result = append(result, kdResult{Date: v.Date, NLowPrice: min, NHighPrice: max, RSV: rsv, K: k, D: d})
+		result = append(result, kdResult{Date: v.Date, ClosePrice: v.ClosePrice, NLowPrice: min, NHighPrice: max, RSV: rsv, K: k, D: d})
 	}
 	return result
 }
