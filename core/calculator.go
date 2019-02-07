@@ -46,10 +46,30 @@ func minMaxFloatSlice(slice interface{}, getValue func(element reflect.Value) fl
 	return min, max
 }
 
-func kdCalculator(stockDailyInfo []dailyInfo, n uint) {
+func kdCalculator(stockDailyInfo []dailyInfo, n int) []kdResult {
 	sort.Slice(stockDailyInfo, func(i, j int) bool {
 		return stockDailyInfo[i].Date < stockDailyInfo[j].Date
 	})
+	result := []kdResult{}
 	// 找最高跟最低的收盤價, 在近n天
-	//minMaxFloatSlice(stockDailyInfo)
+	for i, v := range stockDailyInfo {
+		// index start from 0
+		if i < n-1 {
+			result = append(result, kdResult{Date: v.Date, K: 50, D: 50})
+			continue
+		}
+		// n days high low price
+		min, max := minMaxFloatSlice(stockDailyInfo[i-(n-1):i+1],
+			func(element reflect.Value) float64 {
+				if v, ok := element.Interface().(dailyInfo); ok {
+					return v.ClosePrice
+				}
+				return float64(0)
+			})
+		rsv := float64(100) * (v.ClosePrice - min) / (max - min)
+		k := (float64(1)/3)*rsv + (float64(2)/3)*result[i-1].K
+		d := (float64(1)/3)*k + (float64(2)/3)*result[i-1].D
+		result = append(result, kdResult{Date: v.Date, NLowPrice: min, NHighPrice: max, RSV: rsv, K: k, D: d})
+	}
+	return result
 }
