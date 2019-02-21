@@ -33,10 +33,10 @@ func (s *Scheduler) workerFunc() {
 
 func (s *Scheduler) triggerOnTimeJobs() {
 	cTime := time.Now()
-	for _, job := range s.Jobs {
+	for i, job := range s.Jobs {
 		if cTime.Unix() >= job.JobTriggerTime.Unix() {
 			s.jobQueue <- job.JobWork
-			job.JobTriggerTime = cTime.Add(job.JobPeriod)
+			s.Jobs[i].JobTriggerTime = cTime.Add(job.JobPeriod)
 		}
 	}
 }
