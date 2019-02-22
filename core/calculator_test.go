@@ -90,11 +90,11 @@ func Test_minMaxFloatSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 	}
 }
 
-func Test_kdCalculator_Always_Success(t *testing.T) {
+func Test_KDCalculator_Always_Success(t *testing.T) {
 	testTable := []struct {
 		stockDailyInfo []dailyInfo
 		n              int
-		expect         []kdResult
+		expect         []KDResult
 	}{
 		{
 			stockDailyInfo: []dailyInfo{
@@ -118,7 +118,7 @@ func Test_kdCalculator_Always_Success(t *testing.T) {
 				{Date: 20150213, ClosePrice: 69.45},
 			},
 			n: 9,
-			expect: []kdResult{
+			expect: []KDResult{
 				{Date: 20150121, ClosePrice: 67.25, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
 				{Date: 20150122, ClosePrice: 67.6, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
 				{Date: 20150123, ClosePrice: 68.7, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
@@ -142,7 +142,7 @@ func Test_kdCalculator_Always_Success(t *testing.T) {
 	}
 	const floatPrecise = 0.000001
 	for _, v := range testTable {
-		kd := kdCalculator(v.stockDailyInfo, v.n)
+		kd := KDCalculator(v.stockDailyInfo, v.n)
 		for i, r := range kd {
 			if v.expect[i].Date != r.Date {
 				t.Errorf("Expect Date(%v), result(%v)", v.expect[i].Date, r.Date)

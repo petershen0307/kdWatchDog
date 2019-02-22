@@ -12,15 +12,18 @@ import (
 type pricePeriod string
 
 const (
-	monthPricePeriod pricePeriod = "m"
-	dailyPricePeriod pricePeriod = "d"
-	weekPricePeriod  pricePeriod = "w"
+	// MonthPricePeriod is month period
+	MonthPricePeriod pricePeriod = "m"
+	// DailyPricePeriod is daily period
+	DailyPricePeriod pricePeriod = "d"
+	// WeekPricePeriod is week period
+	WeekPricePeriod pricePeriod = "w"
 )
 
 const stockPriceURLTemplate string = "https://tw.quote.finance.yahoo.net/quote/q?type=ta&perd=%v&mkt=10&sym=%v"
 
 // GetStockInfoFromWeb will return StockPriceInfo which download from yahoo stock web
-func GetStockInfoFromWeb(stockID uint, period pricePeriod) (StockPriceInfo, error) {
+func GetStockInfoFromWeb(stockID string, period pricePeriod) (StockPriceInfo, error) {
 	rawData, err := downloadStockPrice(stockID, period)
 	if err != nil {
 		return StockPriceInfo{}, err
@@ -32,7 +35,7 @@ func GetStockInfoFromWeb(stockID uint, period pricePeriod) (StockPriceInfo, erro
 	return stockInfo, nil
 }
 
-func downloadStockPrice(stockID uint, period pricePeriod) (string, error) {
+func downloadStockPrice(stockID string, period pricePeriod) (string, error) {
 	timeoutRequest := http.Client{Timeout: time.Minute * 5}
 	url := fmt.Sprintf(stockPriceURLTemplate, period, stockID)
 	response, err := timeoutRequest.Get(url)

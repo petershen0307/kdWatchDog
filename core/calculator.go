@@ -9,7 +9,8 @@ import (
 type tMin uint
 type tMax uint
 
-type kdResult struct {
+// KDResult store kd value
+type KDResult struct {
 	Date       uint
 	ClosePrice float64
 	NHighPrice float64
@@ -47,17 +48,18 @@ func minMaxFloatSlice(slice interface{}, getValue func(element reflect.Value) fl
 	return min, max
 }
 
-func kdCalculator(stockDailyInfo []dailyInfo, n int) []kdResult {
+// KDCalculator return the kd value
+func KDCalculator(stockDailyInfo []dailyInfo, n int) []KDResult {
 	sort.Slice(stockDailyInfo, func(i, j int) bool {
 		return stockDailyInfo[i].Date < stockDailyInfo[j].Date
 	})
-	result := []kdResult{}
+	result := []KDResult{}
 	// 找最高跟最低的收盤價, 在近n天
 	for i, v := range stockDailyInfo {
 		// index start from 0
 		if i < n-1 {
 			// go default float value is 0
-			result = append(result, kdResult{Date: v.Date, ClosePrice: v.ClosePrice, K: 50, D: 50})
+			result = append(result, KDResult{Date: v.Date, ClosePrice: v.ClosePrice, K: 50, D: 50})
 			continue
 		}
 		// n days high low price
@@ -71,7 +73,7 @@ func kdCalculator(stockDailyInfo []dailyInfo, n int) []kdResult {
 		rsv := float64(100) * (v.ClosePrice - min) / (max - min)
 		k := (float64(1)/3)*rsv + (float64(2)/3)*result[i-1].K
 		d := (float64(1)/3)*k + (float64(2)/3)*result[i-1].D
-		result = append(result, kdResult{Date: v.Date, ClosePrice: v.ClosePrice, NLowPrice: min, NHighPrice: max, RSV: rsv, K: k, D: d})
+		result = append(result, KDResult{Date: v.Date, ClosePrice: v.ClosePrice, NLowPrice: min, NHighPrice: max, RSV: rsv, K: k, D: d})
 	}
 	return result
 }
