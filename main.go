@@ -15,12 +15,14 @@ func main() {
 				fmt.Println("current time: ", time.Now())
 				// stock list
 				stockList := []string{"1722", "1726", "2204", "3388", "006208"}
+				//stockList := []string{"006208"}
 				for _, id := range stockList {
 					rawData, err := core.GetStockInfoFromWeb(id, core.WeekPricePeriod)
 					if err != nil {
 						return
 					}
 					r := core.KDCalculator(rawData.PriceInfo, 9)
+					core.SaveDataToGoogleSheet(r, id)
 				}
 			}},
 		},
