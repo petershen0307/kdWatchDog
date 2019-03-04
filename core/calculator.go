@@ -32,18 +32,18 @@ func minMaxIntSlice(slice interface{}, minMax func(element reflect.Value, min, m
 }
 
 // return min, max
-func minMaxFloatSlice(slice interface{}, getValue func(element reflect.Value) float64) (float64, float64) {
+func minMaxFloatSlice(slice interface{}, getValue func(element reflect.Value) (float64, float64)) (float64, float64) {
 	min := float64(0)
 	max := float64(0)
 	rv := reflect.ValueOf(slice)
 	length := rv.Len()
 	for i := 0; i < length; i++ {
-		value := getValue(rv.Index(i))
+		vMin, vMax := getValue(rv.Index(i))
 		if 0 == i {
-			min, max = value, value
+			min, max = vMin, vMax
 		}
-		min = math.Min(value, min)
-		max = math.Max(value, max)
+		min = math.Min(vMin, min)
+		max = math.Max(vMax, max)
 	}
 	return min, max
 }
@@ -64,11 +64,11 @@ func KDCalculator(stockDailyInfo []dailyInfo, n int) []KDResult {
 		}
 		// n days high low price
 		min, max := minMaxFloatSlice(stockDailyInfo[i-(n-1):i+1],
-			func(element reflect.Value) float64 {
+			func(element reflect.Value) (float64, float64) {
 				if v, ok := element.Interface().(dailyInfo); ok {
-					return v.ClosePrice
+					return v.LowPrice, v.HighPrice
 				}
-				return float64(0)
+				return float64(0), float64(0)
 			})
 		rsv := float64(100) * (v.ClosePrice - min) / (max - min)
 		k := (float64(1)/3)*rsv + (float64(2)/3)*result[i-1].K

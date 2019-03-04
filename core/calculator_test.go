@@ -67,7 +67,7 @@ func Test_minMaxFloatSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 	for i, test := range testTable {
 		t.Run(fmt.Sprintf("test: %v", i+1), func(t *testing.T) {
 			min, max := minMaxFloatSlice(test.slice,
-				func(element reflect.Value) float64 {
+				func(element reflect.Value) (float64, float64) {
 					r := float64(0)
 					switch element.Type().Name() {
 					case "float64":
@@ -81,7 +81,7 @@ func Test_minMaxFloatSlice_WhenCall_GetMinMaxValue(t *testing.T) {
 							r = v.HighPrice
 						}
 					}
-					return r
+					return r, r
 				})
 			if min != test.expectMin || max != test.expectMax {
 				t.Errorf("\nInput slice:%v\nGot min:(%v) expect min:(%v)\nGot max:(%v) expect max:(%v)", test.slice, min, test.expectMin, max, test.expectMax)
@@ -98,45 +98,33 @@ func Test_KDCalculator_Always_Success(t *testing.T) {
 	}{
 		{
 			stockDailyInfo: []dailyInfo{
-				{Date: 20150121, ClosePrice: 67.25},
-				{Date: 20150122, ClosePrice: 67.6},
-				{Date: 20150123, ClosePrice: 68.7},
-				{Date: 20150126, ClosePrice: 68.7},
-				{Date: 20150127, ClosePrice: 69.15},
-				{Date: 20150128, ClosePrice: 69.15},
-				{Date: 20150129, ClosePrice: 68.3},
-				{Date: 20150130, ClosePrice: 68},
-				{Date: 20150202, ClosePrice: 68.15},
-				{Date: 20150203, ClosePrice: 68.65},
-				{Date: 20150204, ClosePrice: 69.4},
-				{Date: 20150205, ClosePrice: 69.1},
-				{Date: 20150206, ClosePrice: 68.75},
-				{Date: 20150209, ClosePrice: 68.5},
-				{Date: 20150210, ClosePrice: 68.25},
-				{Date: 20150211, ClosePrice: 69},
-				{Date: 20150212, ClosePrice: 69},
-				{Date: 20150213, ClosePrice: 69.45},
+				{Date: 20181029, OpenPrice: 42.1, HighPrice: 42.2, LowPrice: 41.85, ClosePrice: 42.15},
+				{Date: 20181030, OpenPrice: 42.05, HighPrice: 42.15, LowPrice: 41.65, ClosePrice: 41.8},
+				{Date: 20181031, OpenPrice: 42, HighPrice: 42.2, LowPrice: 41.9, ClosePrice: 42},
+				{Date: 20181101, OpenPrice: 42, HighPrice: 42.7, LowPrice: 42, ClosePrice: 42.5},
+				{Date: 20181102, OpenPrice: 42.7, HighPrice: 42.8, LowPrice: 42.2, ClosePrice: 42.25},
+				{Date: 20181105, OpenPrice: 42, HighPrice: 42.4, LowPrice: 41.9, ClosePrice: 42.35},
+				{Date: 20181106, OpenPrice: 42.4, HighPrice: 42.75, LowPrice: 42.05, ClosePrice: 42.3},
+				{Date: 20181107, OpenPrice: 42.4, HighPrice: 43.4, LowPrice: 42.35, ClosePrice: 43.4},
+				{Date: 20181108, OpenPrice: 44, HighPrice: 44, LowPrice: 43.45, ClosePrice: 43.7},
+				{Date: 20181109, OpenPrice: 43.45, HighPrice: 43.6, LowPrice: 43.25, ClosePrice: 43.35},
+				{Date: 20181112, OpenPrice: 43.15, HighPrice: 43.65, LowPrice: 43.15, ClosePrice: 43.4},
+				{Date: 20181113, OpenPrice: 43, HighPrice: 43.1, LowPrice: 42.75, ClosePrice: 43},
 			},
 			n: 9,
 			expect: []KDResult{
-				{Date: 20150121, ClosePrice: 67.25, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150122, ClosePrice: 67.6, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150123, ClosePrice: 68.7, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150126, ClosePrice: 68.7, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150127, ClosePrice: 69.15, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150128, ClosePrice: 69.15, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150129, ClosePrice: 68.3, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150130, ClosePrice: 68, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
-				{Date: 20150202, ClosePrice: 68.15, NHighPrice: 69.15, NLowPrice: 67.25, RSV: 47.36842105, K: 49.12280702, D: 49.70760234},
-				{Date: 20150203, ClosePrice: 68.65, NHighPrice: 69.15, NLowPrice: 67.6, RSV: 67.74193548, K: 55.32918317, D: 51.58146262},
-				{Date: 20150204, ClosePrice: 69.4, NHighPrice: 69.4, NLowPrice: 68, RSV: 100, K: 70.21945545, D: 57.79412689},
-				{Date: 20150205, ClosePrice: 69.1, NHighPrice: 69.4, NLowPrice: 68, RSV: 78.57142857, K: 73.00344649, D: 62.86390009},
-				{Date: 20150206, ClosePrice: 68.75, NHighPrice: 69.4, NLowPrice: 68, RSV: 53.57142857, K: 66.52610718, D: 64.08463579},
-				{Date: 20150209, ClosePrice: 68.5, NHighPrice: 69.4, NLowPrice: 68, RSV: 35.71428571, K: 56.25550003, D: 61.47492387},
-				{Date: 20150210, ClosePrice: 68.25, NHighPrice: 69.4, NLowPrice: 68, RSV: 17.85714286, K: 43.45604764, D: 55.46863179},
-				{Date: 20150211, ClosePrice: 69, NHighPrice: 69.4, NLowPrice: 68, RSV: 71.42857143, K: 52.78022223, D: 54.57249527},
-				{Date: 20150212, ClosePrice: 69, NHighPrice: 69.4, NLowPrice: 68.15, RSV: 68, K: 57.85348149, D: 55.66615734},
-				{Date: 20150213, ClosePrice: 69.45, NHighPrice: 69.45, NLowPrice: 68.25, RSV: 100, K: 71.90232099, D: 61.07821189},
+				{Date: 20181029, ClosePrice: 42.15, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181030, ClosePrice: 41.8, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181031, ClosePrice: 42, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181101, ClosePrice: 42.5, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181102, ClosePrice: 42.25, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181105, ClosePrice: 42.35, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181106, ClosePrice: 42.3, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181107, ClosePrice: 43.4, NHighPrice: 0.0, NLowPrice: 0, RSV: 0.0, K: 50, D: 50},
+				{Date: 20181108, ClosePrice: 43.7, NHighPrice: 44, NLowPrice: 41.65, RSV: 87.23404255, K: 62.41134752, D: 54.13711584},
+				{Date: 20181109, ClosePrice: 43.35, NHighPrice: 44, NLowPrice: 41.65, RSV: 72.34042553, K: 65.72104019, D: 57.99842396},
+				{Date: 20181112, ClosePrice: 43.4, NHighPrice: 44, NLowPrice: 41.9, RSV: 71.42857143, K: 67.6235506, D: 61.2067995},
+				{Date: 20181113, ClosePrice: 43, NHighPrice: 44, NLowPrice: 41.9, RSV: 52.38095238, K: 62.54268453, D: 61.65209451},
 			},
 		},
 	}
