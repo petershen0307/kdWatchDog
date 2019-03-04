@@ -20,13 +20,15 @@ type Scheduler struct {
 }
 
 // unit is ms
-const scheduleTimePrecise = 100 * time.Millisecond
+const scheduleTimePrecise = time.Second
 
 func (s *Scheduler) workerFunc() {
 	for {
 		select {
 		case x := <-s.jobQueue:
 			x()
+		default:
+			time.Sleep(time.Second)
 		}
 	}
 }
@@ -56,7 +58,8 @@ func (s *Scheduler) Run() {
 			// check scheduler jobs
 			s.triggerOnTimeJobs()
 		default:
-			// do nothing
+			// go to sleep
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }
