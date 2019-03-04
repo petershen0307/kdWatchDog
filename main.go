@@ -17,12 +17,13 @@ func main() {
 				stockList := []string{"1722", "1726", "2204", "3388", "006208"}
 				//stockList := []string{"006208"}
 				for _, id := range stockList {
-					rawData, err := core.GetStockInfoFromWeb(id, core.WeekPricePeriod)
+					rawData, err := core.GetStockInfoFromWeb(id, core.DailyPricePeriod)
 					if err != nil {
 						return
 					}
-					r := core.KDCalculator(rawData.PriceInfo, 9)
-					core.SaveDataToGoogleSheet(r, id)
+					// skip first 3 data, like yahoo
+					r := core.KDCalculator(rawData.PriceInfo[3:], 9)
+					core.SaveDataToGoogleSheet(r, id, core.DailyPricePeriod)
 				}
 			}},
 		},
