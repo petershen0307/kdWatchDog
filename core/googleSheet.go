@@ -11,11 +11,11 @@ const spreadsheetID = "1VWsWERMQWhycfxz7xZEK0I8rBSHOwnW09OCG7HIL1k4"
 
 // KDStockInfo include stock id and kd info
 type KDStockInfo struct {
-	stockID      string
-	latestKDInfo KDResult
+	StockID      string
+	LatestKDInfo KDResult
 }
 
-func saveKDValueToSheet(stockData []KDStockInfo, sheetName pricePeriod) {
+func SaveKDValueToSheet(stockData []KDStockInfo, sheetName pricePeriod) {
 	//日期	股票	收盤價	最高價	最低價	RSV	K	D
 	//A     B       C      D      E       F   G   H
 	sheetData := sheets.ValueRange{
@@ -24,14 +24,14 @@ func saveKDValueToSheet(stockData []KDStockInfo, sheetName pricePeriod) {
 	}
 	for _, oneStock := range stockData {
 		rowData := []interface{}{
-			oneStock.latestKDInfo.Date,
-			oneStock.stockID,
-			oneStock.latestKDInfo.ClosePrice,
-			oneStock.latestKDInfo.NHighPrice,
-			oneStock.latestKDInfo.NLowPrice,
-			oneStock.latestKDInfo.RSV,
-			oneStock.latestKDInfo.K,
-			oneStock.latestKDInfo.D,
+			oneStock.LatestKDInfo.Date,
+			oneStock.StockID,
+			oneStock.LatestKDInfo.ClosePrice,
+			oneStock.LatestKDInfo.NHighPrice,
+			oneStock.LatestKDInfo.NLowPrice,
+			oneStock.LatestKDInfo.RSV,
+			oneStock.LatestKDInfo.K,
+			oneStock.LatestKDInfo.D,
 		}
 		sheetData.Values = append(sheetData.Values, rowData)
 	}

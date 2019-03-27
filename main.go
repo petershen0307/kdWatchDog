@@ -16,6 +16,7 @@ func main() {
 				// stock list
 				stockList := []string{"1722", "1726", "2204", "3388", "006208"}
 				//stockList := []string{"006208"}
+				allStockDailyKD := []core.KDStockInfo{}
 				for _, id := range stockList {
 					rawData, err := core.GetStockInfoFromWeb(id, core.DailyPricePeriod)
 					if err != nil {
@@ -23,8 +24,13 @@ func main() {
 					}
 					// skip first 3 data, like yahoo
 					r := core.KDCalculator(rawData.PriceInfo[3:], 9)
-					core.SaveDataToGoogleSheet(r, id, core.DailyPricePeriod)
+					allStockDailyKD = append(allStockDailyKD,
+						core.KDStockInfo{
+							StockID:      id,
+							LatestKDInfo: r[len(r)-1],
+						})
 				}
+				core.SaveKDValueToSheet(allStockDailyKD, core.DailyPricePeriod)
 			}},
 		},
 		NumberOfJobWorker: 1,
