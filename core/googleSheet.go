@@ -53,3 +53,22 @@ func SaveKDValueToSheet(stockData []KDStockInfo, sheetName pricePeriod) {
 		log.Fatal(err)
 	}
 }
+
+//GetStockWatchList get interested stock id from google sheet
+func GetStockWatchList() []string {
+	readRange := "watchList!A:A"
+	sheetSvc := getSheetSvc()
+	resp, err := sheetSvc.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve data from sheet: %v", err)
+	}
+	stockIDList := []string{}
+	if len(resp.Values) == 0 {
+		log.Fatalf("No data found.")
+	} else {
+		for _, row := range resp.Values {
+			stockIDList = append(stockIDList, row[0].(string))
+		}
+	}
+	return stockIDList
+}

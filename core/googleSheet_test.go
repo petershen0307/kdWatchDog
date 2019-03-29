@@ -17,3 +17,8 @@ func Test_SaveKDValueToSheet_request_success(t *testing.T) {
 	}
 	SaveKDValueToSheet(data, MonthPricePeriod)
 }
+
+func Test_GetStockWatchList(t *testing.T) {
+	stockIDList := GetStockWatchList()
+	t.Log(stockIDList)
+}
