@@ -14,8 +14,7 @@ func main() {
 			{JobPeriod: 24 * time.Hour, JobTriggerTime: time.Now(), JobWork: func() {
 				fmt.Println("current time: ", time.Now())
 				// stock list
-				stockList := []string{"1722", "1726", "2204", "3388", "006208"}
-				//stockList := []string{"006208"}
+				stockList := core.GetStockWatchList()
 				allStockDailyKD := []core.KDStockInfo{}
 				for _, id := range stockList {
 					rawData, err := core.GetStockInfoFromWeb(id, core.DailyPricePeriod)
