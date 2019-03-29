@@ -28,6 +28,7 @@ func main() {
 						core.KDStockInfo{
 							StockID:      id,
 							LatestKDInfo: r[len(r)-1],
+							StockName:    rawData.Mem.Name,
 						})
 				}
 				core.SaveKDValueToSheet(allStockDailyKD, core.DailyPricePeriod)

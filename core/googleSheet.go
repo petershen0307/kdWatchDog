@@ -13,19 +13,22 @@ const spreadsheetID = "1VWsWERMQWhycfxz7xZEK0I8rBSHOwnW09OCG7HIL1k4"
 type KDStockInfo struct {
 	StockID      string
 	LatestKDInfo KDResult
+	StockName    string
 }
 
+//SaveKDValueToSheet send KD info to google sheet
 func SaveKDValueToSheet(stockData []KDStockInfo, sheetName pricePeriod) {
-	//日期	股票	收盤價	最高價	最低價	RSV	K	D
-	//A     B       C      D      E       F   G   H
+	//日期	股票	名稱	收盤價	最高價	最低價	RSV	K	D
+	//A     B       C      D      E       F      G   H   I
 	sheetData := sheets.ValueRange{
-		Range:          fmt.Sprintf("%v!A2:H", sheetName),
+		Range:          fmt.Sprintf("%v!A2:I", sheetName),
 		MajorDimension: "ROWS",
 	}
 	for _, oneStock := range stockData {
 		rowData := []interface{}{
 			oneStock.LatestKDInfo.Date,
 			oneStock.StockID,
+			oneStock.StockName,
 			oneStock.LatestKDInfo.ClosePrice,
 			oneStock.LatestKDInfo.NHighPrice,
 			oneStock.LatestKDInfo.NLowPrice,

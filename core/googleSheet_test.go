@@ -12,6 +12,7 @@ func Test_SaveKDValueToSheet_request_success(t *testing.T) {
 		KDStockInfo{
 			StockID:      "1234",
 			LatestKDInfo: stockDailyInfo[len(stockDailyInfo)-1],
+			StockName:    "Just test",
 		},
 	}
 	SaveKDValueToSheet(data, MonthPricePeriod)
