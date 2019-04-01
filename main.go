@@ -11,7 +11,7 @@ import (
 func main() {
 	s := service.Scheduler{
 		Jobs: []service.ScheduleJob{
-			{JobPeriod: 24 * time.Hour, JobTriggerTime: time.Now(), JobWork: func() {
+			{JobPeriod: 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 0, 0, 0, time.Local), JobWork: func() {
 				fmt.Println("current time: ", time.Now())
 				// stock list
 				stockList := core.GetStockWatchList()
