@@ -1,12 +1,16 @@
 package service
 
-import "time"
+import (
+	"log"
+	"time"
+)
 
 // JobStruct define the job structure
 type JobStruct func()
 
 // ScheduleJob is a job configuration
 type ScheduleJob struct {
+	JobName        string
 	JobPeriod      time.Duration
 	JobTriggerTime time.Time //Kitchen     = "3:04PM"
 	JobWork        JobStruct
@@ -36,9 +40,11 @@ func (s *Scheduler) workerFunc() {
 func (s *Scheduler) triggerOnTimeJobs() {
 	cTime := time.Now()
 	for i, job := range s.Jobs {
-		if cTime.Unix() >= job.JobTriggerTime.Unix() {
+		if cTime.After(job.JobTriggerTime) {
+			log.Printf("trigger job: %v, time: %v", job.JobName, job.JobTriggerTime)
 			s.jobQueue <- job.JobWork
-			s.Jobs[i].JobTriggerTime = cTime.Add(job.JobPeriod)
+			s.Jobs[i].JobTriggerTime = job.JobTriggerTime.Add(job.JobPeriod)
+			log.Printf("job: %v, next trigger time: %v", job.JobName, s.Jobs[i].JobTriggerTime)
 		}
 	}
 }
