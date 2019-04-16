@@ -15,7 +15,7 @@ type gsData struct {
 }
 
 // SaveDataToGoogleSheet send the data to google sheet
-func SaveDataToGoogleSheet(kdInfo []KDResult, stockID string, tabName pricePeriod) error {
+func SaveDataToGoogleSheet(kdInfo []KDResult, stockID string, tabName PricePeriod) error {
 	googleScriptURL := fmt.Sprintf("https://script.google.com/macros/s/AKfycbwpX0l_OVCz9jV5JpKoBexfyk_8zzgtCRCaySL8hOlarjWaTbox/exec?tab=%s", tabName)
 	timeoutRequest := http.Client{Timeout: time.Minute * 1}
 	url := fmt.Sprintf(googleScriptURL)

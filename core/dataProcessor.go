@@ -9,21 +9,21 @@ import (
 	"time"
 )
 
-type pricePeriod string
+type PricePeriod string
 
 const (
 	// MonthPricePeriod is month period
-	MonthPricePeriod pricePeriod = "m"
+	MonthPricePeriod PricePeriod = "m"
 	// DailyPricePeriod is daily period
-	DailyPricePeriod pricePeriod = "d"
+	DailyPricePeriod PricePeriod = "d"
 	// WeekPricePeriod is week period
-	WeekPricePeriod pricePeriod = "w"
+	WeekPricePeriod PricePeriod = "w"
 )
 
 const stockPriceURLTemplate string = "https://tw.quote.finance.yahoo.net/quote/q?type=ta&perd=%v&mkt=10&sym=%v"
 
 // GetStockInfoFromWeb will return StockPriceInfo which download from yahoo stock web
-func GetStockInfoFromWeb(stockID string, period pricePeriod) (StockPriceInfo, error) {
+func GetStockInfoFromWeb(stockID string, period PricePeriod) (StockPriceInfo, error) {
 	rawData, err := downloadStockPrice(stockID, period)
 	if err != nil {
 		return StockPriceInfo{}, err
@@ -35,7 +35,7 @@ func GetStockInfoFromWeb(stockID string, period pricePeriod) (StockPriceInfo, er
 	return stockInfo, nil
 }
 
-func downloadStockPrice(stockID string, period pricePeriod) (string, error) {
+func downloadStockPrice(stockID string, period PricePeriod) (string, error) {
 	timeoutRequest := http.Client{Timeout: time.Minute * 5}
 	url := fmt.Sprintf(stockPriceURLTemplate, period, stockID)
 	response, err := timeoutRequest.Get(url)
@@ -67,7 +67,7 @@ type stockMemo struct {
 // StockPriceInfo contain stock price information which are daily or monthly
 type StockPriceInfo struct {
 	ID        string      `json:"id"`
-	Period    pricePeriod `json:"perd"`
+	Period    PricePeriod `json:"perd"`
 	Mem       stockMemo   `json:"mem"`
 	PriceInfo []dailyInfo `json:"ta"`
 }

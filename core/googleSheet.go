@@ -17,7 +17,7 @@ type KDStockInfo struct {
 }
 
 //SaveKDValueToSheet send KD info to google sheet
-func SaveKDValueToSheet(stockData []KDStockInfo, sheetName pricePeriod) {
+func SaveKDValueToSheet(stockData []KDStockInfo, sheetName PricePeriod) {
 	//日期	股票	名稱	收盤價	最高價	最低價	RSV	K	D
 	//A     B       C      D      E       F      G   H   I
 	sheetData := sheets.ValueRange{

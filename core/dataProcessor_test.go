@@ -9,7 +9,7 @@ import (
 func Test_downloadStockPrice_WhenCall_Success(t *testing.T) {
 	testTable := []struct {
 		stockID string
-		period  pricePeriod
+		period  PricePeriod
 	}{
 		{stockID: "1234", period: WeekPricePeriod},
 		{stockID: "006208", period: WeekPricePeriod},
