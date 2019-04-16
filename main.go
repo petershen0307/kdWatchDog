@@ -8,6 +8,8 @@ func main() {
 	s := service.Scheduler{
 		Jobs: []service.ScheduleJob{
 			service.GetDailyJob(),
+			service.GetWeeklyJob(),
+			service.GetMonthlyJob(),
 		},
 		NumberOfJobWorker: 1,
 	}

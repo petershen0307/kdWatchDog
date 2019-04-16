@@ -27,12 +27,32 @@ func updateKDInfoByPeriod(period core.PricePeriod) {
 	core.SaveKDValueToSheet(allStockDailyKD, period)
 }
 
-// GetDailyJob return the daily scheduler job
+// GetDailyJob return the daily kd scheduler job
 func GetDailyJob() ScheduleJob {
 	return ScheduleJob{
 		JobName: "Daily", JobPeriod: 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 0, 0, 0, time.Local),
 		JobWork: func() {
 			updateKDInfoByPeriod(core.DailyPricePeriod)
+		},
+	}
+}
+
+// GetWeeklyJob return the weekly kd scheduler job
+func GetWeeklyJob() ScheduleJob {
+	return ScheduleJob{
+		JobName: "Weekly", JobPeriod: 2 * 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 10, 0, 0, time.Local),
+		JobWork: func() {
+			updateKDInfoByPeriod(core.WeekPricePeriod)
+		},
+	}
+}
+
+// GetMonthlyJob return the monthly kd scheduler job
+func GetMonthlyJob() ScheduleJob {
+	return ScheduleJob{
+		JobName: "Monthly", JobPeriod: 2 * 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 20, 0, 0, time.Local),
+		JobWork: func() {
+			updateKDInfoByPeriod(core.MonthPricePeriod)
 		},
 	}
 }
