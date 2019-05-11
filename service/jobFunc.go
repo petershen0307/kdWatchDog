@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"time"
 
 	"github.com/petershen0307/kdWatchDog/core"
@@ -13,6 +14,7 @@ func updateKDInfoByPeriod(period core.PricePeriod) {
 	for _, id := range stockList {
 		rawData, err := core.GetStockInfoFromWeb(id, period)
 		if err != nil {
+			log.Fatalln("Can't get stock from sheet.", err)
 			return
 		}
 		// skip first 3 data, like yahoo
