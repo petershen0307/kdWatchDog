@@ -4,6 +4,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/petershen0307/schedulerGo"
+
 	"github.com/petershen0307/kdWatchDog/core"
 )
 
@@ -14,7 +16,7 @@ func updateKDInfoByPeriod(period core.PricePeriod) {
 	for _, id := range stockList {
 		rawData, err := core.GetStockInfoFromWeb(id, period)
 		if err != nil {
-			log.Fatalln("Can't get stock from sheet.", err)
+			log.Println("Can't get stock from web.", err)
 			return
 		}
 		// skip first 3 data, like yahoo
@@ -30,31 +32,28 @@ func updateKDInfoByPeriod(period core.PricePeriod) {
 }
 
 // GetDailyJob return the daily kd scheduler job
-func GetDailyJob() ScheduleJob {
-	return ScheduleJob{
-		JobName: "Daily", JobPeriod: 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 0, 0, 0, time.Local),
-		JobWork: func() {
+func GetDailyJob() schedulergo.ScheduleJob {
+	return *schedulergo.NewJob("Daily", 24*time.Hour,
+		time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 0, 0, 0, time.Local),
+		func() {
 			updateKDInfoByPeriod(core.DailyPricePeriod)
-		},
-	}
+		})
 }
 
 // GetWeeklyJob return the weekly kd scheduler job
-func GetWeeklyJob() ScheduleJob {
-	return ScheduleJob{
-		JobName: "Weekly", JobPeriod: 2 * 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 10, 0, 0, time.Local),
-		JobWork: func() {
+func GetWeeklyJob() schedulergo.ScheduleJob {
+	return *schedulergo.NewJob("Weekly", 2*24*time.Hour,
+		time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 10, 0, 0, time.Local),
+		func() {
 			updateKDInfoByPeriod(core.WeekPricePeriod)
-		},
-	}
+		})
 }
 
 // GetMonthlyJob return the monthly kd scheduler job
-func GetMonthlyJob() ScheduleJob {
-	return ScheduleJob{
-		JobName: "Monthly", JobPeriod: 2 * 24 * time.Hour, JobTriggerTime: time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 20, 0, 0, time.Local),
-		JobWork: func() {
+func GetMonthlyJob() schedulergo.ScheduleJob {
+	return *schedulergo.NewJob("Monthly", 2*24*time.Hour,
+		time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 20, 0, 0, time.Local),
+		func() {
 			updateKDInfoByPeriod(core.MonthPricePeriod)
-		},
-	}
+		})
 }

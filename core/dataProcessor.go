@@ -78,7 +78,7 @@ func parseStockPriceJSON(rawData string) (StockPriceInfo, error) {
 	var jsonData StockPriceInfo
 	err := json.Unmarshal([]byte(jsonStr), &jsonData)
 	if err != nil {
-		return StockPriceInfo{}, err
+		return StockPriceInfo{}, fmt.Errorf("Data: (%v), Err:(%v)", jsonStr, err)
 	}
 	return jsonData, nil
 }
