@@ -11,8 +11,21 @@ func Test_downloadStockPrice_WhenCall_Success(t *testing.T) {
 		stockID string
 		period  PricePeriod
 	}{
-		{stockID: "1234", period: WeekPricePeriod},
 		{stockID: "006208", period: WeekPricePeriod},
+		{stockID: "00692", period: WeekPricePeriod},
+		// {stockID: "1227", period: WeekPricePeriod},
+		// {stockID: "1229", period: WeekPricePeriod},
+		// {stockID: "1231", period: WeekPricePeriod},
+		// {stockID: "1233", period: WeekPricePeriod},
+		// {stockID: "1259", period: WeekPricePeriod},
+		// {stockID: "1722", period: WeekPricePeriod},
+		// {stockID: "1726", period: WeekPricePeriod},
+		// {stockID: "2204", period: WeekPricePeriod},
+		// {stockID: "2884", period: WeekPricePeriod},
+		// {stockID: "2886", period: WeekPricePeriod},
+		// {stockID: "2891", period: WeekPricePeriod},
+		// {stockID: "3388", period: WeekPricePeriod},
+		// {stockID: "5876", period: WeekPricePeriod},
 	}
 	for _, test := range testTable {
 		t.Run(fmt.Sprintf("stockID:(%v), period:(%v)", test.stockID, test.period), func(t *testing.T) {

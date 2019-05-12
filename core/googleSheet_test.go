@@ -15,7 +15,7 @@ func Test_SaveKDValueToSheet_request_success(t *testing.T) {
 			StockName:    "Just test",
 		},
 	}
-	SaveKDValueToSheet(data, MonthPricePeriod)
+	SaveKDValueToSheet(data, "test")
 }
 
 func Test_GetStockWatchList(t *testing.T) {
