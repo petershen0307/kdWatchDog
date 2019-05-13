@@ -16,8 +16,8 @@ func updateKDInfoByPeriod(period core.PricePeriod) {
 	for _, id := range stockList {
 		rawData, err := core.GetStockInfoFromWeb(id, period)
 		if err != nil {
-			log.Println("Can't get stock from web.", err)
-			return
+			log.Printf("Can't get stock(%v) from web. %v", id, err)
+			continue
 		}
 		// skip first 3 data, like yahoo
 		r := core.KDCalculator(rawData.PriceInfo[3:], 9)
@@ -42,7 +42,7 @@ func GetDailyJob() schedulergo.ScheduleJob {
 
 // GetWeeklyJob return the weekly kd scheduler job
 func GetWeeklyJob() schedulergo.ScheduleJob {
-	return *schedulergo.NewJob("Weekly", 2*24*time.Hour,
+	return *schedulergo.NewJob("Weekly", 24*time.Hour,
 		time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 10, 0, 0, time.Local),
 		func() {
 			updateKDInfoByPeriod(core.WeekPricePeriod)
@@ -51,7 +51,7 @@ func GetWeeklyJob() schedulergo.ScheduleJob {
 
 // GetMonthlyJob return the monthly kd scheduler job
 func GetMonthlyJob() schedulergo.ScheduleJob {
-	return *schedulergo.NewJob("Monthly", 2*24*time.Hour,
+	return *schedulergo.NewJob("Monthly", 24*time.Hour,
 		time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 16, 20, 0, 0, time.Local),
 		func() {
 			updateKDInfoByPeriod(core.MonthPricePeriod)

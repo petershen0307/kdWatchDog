@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"time"
+	"sync"
 
 	"github.com/petershen0307/kdWatchDog/service"
 	"github.com/petershen0307/schedulerGo"
@@ -18,14 +18,13 @@ func main() {
 	s.Run()
 	osEvent := make(chan os.Signal, 1)
 	signal.Notify(osEvent, os.Interrupt)
-	for {
-		select {
-		case <-osEvent:
-			break
-		default:
-			time.Sleep(time.Second)
-		}
-	}
+	var endWaiter sync.WaitGroup
+	endWaiter.Add(1)
+	go func() {
+		<-osEvent
+		endWaiter.Done()
+	}()
+	endWaiter.Wait()
 	log.Println("Program stop")
 	s.Stop()
 	// [ToDo] wait scheduler worker stopped
