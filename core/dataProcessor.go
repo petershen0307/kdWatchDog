@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// PricePeriod define the month, day, week period for kd value
 type PricePeriod string
 
 const (

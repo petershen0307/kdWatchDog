@@ -42,8 +42,8 @@ func SaveKDValueToSheet(stockData []KDStockInfo, sheetName PricePeriod) {
 		&sheetData,
 	}
 	rb := &sheets.BatchUpdateValuesRequest{
-		ValueInputOption: "RAW",
-		Data:             data,
+		ValueInputOption:          "RAW",
+		Data:                      data,
 		ResponseValueRenderOption: "UNFORMATTED_VALUE",
 		//IncludeValuesInResponse:   false,
 	}
