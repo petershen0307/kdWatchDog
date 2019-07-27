@@ -1,5 +1,7 @@
 # kdWatchDog
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/petershen0307/kdWatchDog)](https://goreportcard.com/report/github.com/petershen0307/kdWatchDog)
+
 ## KD 公式
 [KD公式](https://www.ezchart.com.tw/inds.php?IND=KD)
 [範例](http://yhhuang1966.blogspot.com/2015/02/kd.html)
