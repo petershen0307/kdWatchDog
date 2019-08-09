@@ -1,5 +1,6 @@
 # kdWatchDog
 
+[![Build Status](https://dev.azure.com/petershen0307/petershen0307/_apis/build/status/petershen0307.kdWatchDog?branchName=master)](https://dev.azure.com/petershen0307/petershen0307/_build/latest?definitionId=2&branchName=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/petershen0307/kdWatchDog)](https://goreportcard.com/report/github.com/petershen0307/kdWatchDog)
 
 ## KD 公式
