@@ -1,6 +1,6 @@
 # kdWatchDog
 
-[![Build Status](https://github.com/petershen0307/kdWatchDog/workflows/Go/badge.svg?branch=master)](https://github.com/petershen0307/kdWatchDog/workflows/Go/badge.svg?branch=master)
+[![Build Status](https://github.com/petershen0307/kdWatchDog/workflows/build-ci/badge.svg?branch=master)](https://github.com/petershen0307/kdWatchDog/workflows/build-ci/badge.svg?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/petershen0307/kdWatchDog)](https://goreportcard.com/report/github.com/petershen0307/kdWatchDog)
 
 ## KD 公式
