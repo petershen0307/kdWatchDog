@@ -9,18 +9,18 @@ import (
 
 func main() {
 	var (
-		port      = os.Getenv("PORT")       // sets automatically
-		publicURL = os.Getenv("PUBLIC_URL") // you must add it to your config vars
-		token     = os.Getenv("TOKEN")      // you must add it to your config vars
+		herokuPort = os.Getenv("PORT")
+		herokuURL  = os.Getenv("HEROKU_URL")
+		tgToken    = os.Getenv("TG_TOKEN")
 	)
 
 	webhook := &tb.Webhook{
-		Listen:   ":" + port,
-		Endpoint: &tb.WebhookEndpoint{PublicURL: publicURL},
+		Listen:   ":" + herokuPort,
+		Endpoint: &tb.WebhookEndpoint{PublicURL: herokuURL},
 	}
 
 	pref := tb.Settings{
-		Token:  token,
+		Token:  tgToken,
 		Poller: webhook,
 	}
 
@@ -29,8 +29,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	b.Handle("/hello", func(m *tb.Message) {
-		b.Send(m.Sender, "You entered "+m.Text)
+	b.Handle(tb.OnText, func(m *tb.Message) {
+		b.Send(m.Sender, "Echo "+m.Text)
 	})
 
 	b.Start()
