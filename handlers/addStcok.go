@@ -15,7 +15,7 @@ import (
 
 const addCommand = "/add"
 
-func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo.Collection) (string, botHandler) {
+func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo.Collection) (string, func(*tg.Message)) {
 	return addCommand, func(m *tg.Message) {
 		stockID := strings.Replace(m.Text, addCommand, "", 1)
 		stockID = strings.TrimSpace(stockID)

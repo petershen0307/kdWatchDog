@@ -14,7 +14,7 @@ import (
 
 const listCommand = "/list"
 
-func getListStockHandler(responseCallback responseCallbackFunc, collection *mongo.Collection) (string, botHandler) {
+func getListStockHandler(responseCallback responseCallbackFunc, collection *mongo.Collection) (string, func(*tg.Message)) {
 	return listCommand, func(m *tg.Message) {
 		var responseMsg *string = new(string)
 		*responseMsg = "no data"

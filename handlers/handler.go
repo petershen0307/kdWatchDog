@@ -6,7 +6,6 @@ import (
 )
 
 type responseCallbackFunc func(tg.Recipient, interface{}, ...interface{})
-type botHandler func(*tg.Message)
 
 // RegisterHandlers register bot handers
 func RegisterHandlers(bot *tg.Bot, collection *mongo.Collection) {
