@@ -17,35 +17,35 @@ import (
 
 func TestAddStockIDSuite(t *testing.T) {
 	t.Skip()
-	suite.Run(t, new(addStockIDTestSuite))
+	suite.Run(t, new(addHandleTestSuite))
 }
 
-type addStockIDTestSuite struct {
+type addHandleTestSuite struct {
 	suite.Suite
 	client     *mongo.Client
 	collection *mongo.Collection
 }
 
-func (s *addStockIDTestSuite) SetupSuite() {
+func (s *addHandleTestSuite) SetupSuite() {
 	var err error
 	s.client, err = test.InitDB()
 	assert.NoError(s.T(), err)
 	s.collection = test.GetCollection(s.client, "users")
 }
 
-func (s *addStockIDTestSuite) TearDownSuite() {
+func (s *addHandleTestSuite) TearDownSuite() {
 	assert.NoError(s.T(), test.Deinit(s.client, "users"))
 }
 
-func (s *addStockIDTestSuite) TearDownTest() {
+func (s *addHandleTestSuite) TearDownTest() {
 	assert.NoError(s.T(), test.RemoveDocs(s.collection))
 }
 
-func (s *addStockIDTestSuite) Test_getAddStockHandler_oneData() {
+func (s *addHandleTestSuite) Test_getAddStockHandler_oneData() {
 	// arrange
 	gotValue := ""
 	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = what.(string)
+		gotValue = *what.(*string)
 	}
 	stockID := "1234"
 	userID := 5566
@@ -61,14 +61,14 @@ func (s *addStockIDTestSuite) Test_getAddStockHandler_oneData() {
 
 	// assert
 	assert.Equal(s.T(), addCommand, command)
-	assert.Equal(s.T(), gotValue, fmt.Sprintf("add %v ok", stockID))
+	assert.Equal(s.T(), fmt.Sprintf("add %v ok", stockID), gotValue)
 }
 
-func (s *addStockIDTestSuite) Test_getAddStockHandler_sameUserSecondData() {
+func (s *addHandleTestSuite) Test_getAddStockHandler_sameUserSecondData() {
 	// arrange
 	gotValue := ""
 	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = what.(string)
+		gotValue = *what.(*string)
 	}
 	stockID := "12345"
 	userID := 7788
@@ -80,6 +80,7 @@ func (s *addStockIDTestSuite) Test_getAddStockHandler_sameUserSecondData() {
 			},
 		}, options.Update().SetUpsert(true))
 	assert.NoError(s.T(), err)
+
 	// act
 	command, f := getAddStockHandler(responseCallback, s.collection)
 	f(&tg.Message{
@@ -91,5 +92,28 @@ func (s *addStockIDTestSuite) Test_getAddStockHandler_sameUserSecondData() {
 
 	// assert
 	assert.Equal(s.T(), addCommand, command)
-	assert.Equal(s.T(), gotValue, fmt.Sprintf("add %v ok", stockID))
+	assert.Equal(s.T(), fmt.Sprintf("add %v ok", stockID), gotValue)
+}
+
+func (s *addHandleTestSuite) Test_getAddStockHandler_invalidStockID() {
+	// arrange
+	gotValue := ""
+	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
+		gotValue = *what.(*string)
+	}
+	stockID := ""
+	userID := 5566
+
+	// act
+	command, f := getAddStockHandler(responseCallback, s.collection)
+	f(&tg.Message{
+		Sender: &tg.User{
+			ID: userID,
+		},
+		Text: fmt.Sprintf("/add %v", stockID),
+	})
+
+	// assert
+	assert.Equal(s.T(), addCommand, command)
+	assert.Equal(s.T(), "invalid stock id", gotValue)
 }
