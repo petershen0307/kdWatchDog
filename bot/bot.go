@@ -29,13 +29,5 @@ func New(configs config.Config) *tg.Bot {
 	if err != nil {
 		log.Panic(err)
 	}
-	registerHandlers(b)
 	return b
-}
-
-func registerHandlers(bot *tg.Bot) {
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		bot.Send(to, what, options...)
-	}
-	bot.Handle(getEchoHandler(responseCallback))
 }
