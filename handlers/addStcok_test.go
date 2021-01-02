@@ -2,40 +2,94 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
-	"github.com/petershen0307/kdWatchDog/config"
+	"github.com/petershen0307/kdWatchDog/models"
+	"github.com/petershen0307/kdWatchDog/test"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"gopkg.in/mgo.v2/bson"
 	tg "gopkg.in/tucnak/telebot.v2"
 )
 
-func Test_getAddStockHandler(t *testing.T) {
+func TestAddStockIDSuite(t *testing.T) {
 	t.Skip()
-	configs := config.Config{
-		MongoDBURI: "mongodb://localhost:27017/ut",
-		DBName:     "kdWatchDog",
-	}
+	suite.Run(t, new(addStockIDTestSuite))
+}
 
-	clientOptions := options.Client().ApplyURI(configs.MongoDBURI)
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		t.Fatal(err)
-	}
-	collection := client.Database(configs.DBName).Collection("users")
+type addStockIDTestSuite struct {
+	suite.Suite
+	client     *mongo.Client
+	collection *mongo.Collection
+}
+
+func (s *addStockIDTestSuite) SetupSuite() {
+	var err error
+	s.client, err = test.InitDB()
+	assert.NoError(s.T(), err)
+	s.collection = test.GetCollection(s.client, "users")
+}
+
+func (s *addStockIDTestSuite) TearDownSuite() {
+	assert.NoError(s.T(), test.Deinit(s.client, "users"))
+}
+
+func (s *addStockIDTestSuite) TearDownTest() {
+	assert.NoError(s.T(), test.RemoveDocs(s.collection))
+}
+
+func (s *addStockIDTestSuite) Test_getAddStockHandler_oneData() {
+	// arrange
+	gotValue := ""
 	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		if what != "add 1234ok" {
-			t.Fatalf("Got wrong msg (%v)", what)
-		}
+		gotValue = what.(string)
 	}
-	command, f := getAddStockHandler(responseCallback, collection)
-	if command != addCommand {
-		t.Fatal("Wrong command")
-	}
+	stockID := "1234"
+	userID := 5566
+
+	// act
+	command, f := getAddStockHandler(responseCallback, s.collection)
 	f(&tg.Message{
 		Sender: &tg.User{
-			ID: 5566,
+			ID: userID,
 		},
-		Text: "/add 1234",
+		Text: fmt.Sprintf("/add %v", stockID),
 	})
+
+	// assert
+	assert.Equal(s.T(), addCommand, command)
+	assert.Equal(s.T(), gotValue, fmt.Sprintf("add %v ok", stockID))
+}
+
+func (s *addStockIDTestSuite) Test_getAddStockHandler_sameUserSecondData() {
+	// arrange
+	gotValue := ""
+	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
+		gotValue = what.(string)
+	}
+	stockID := "12345"
+	userID := 7788
+	_, err := s.collection.UpdateOne(context.Background(), bson.M{"user_id": userID},
+		bson.M{
+			"$set": models.User{
+				UserID: userID,
+				Stocks: []string{"1111", "2222"},
+			},
+		}, options.Update().SetUpsert(true))
+	assert.NoError(s.T(), err)
+	// act
+	command, f := getAddStockHandler(responseCallback, s.collection)
+	f(&tg.Message{
+		Sender: &tg.User{
+			ID: userID,
+		},
+		Text: fmt.Sprintf("/add %v", stockID),
+	})
+
+	// assert
+	assert.Equal(s.T(), addCommand, command)
+	assert.Equal(s.T(), gotValue, fmt.Sprintf("add %v ok", stockID))
 }
