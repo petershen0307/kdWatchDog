@@ -11,6 +11,7 @@ import (
 )
 
 func Test_getAddStockHandler(t *testing.T) {
+	t.Skip()
 	configs := config.Config{
 		MongoDBURI: "mongodb://localhost:27017/ut",
 		DBName:     "kdWatchDog",
