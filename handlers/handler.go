@@ -20,4 +20,5 @@ func RegisterHandlers(bot *tg.Bot, collection *mongo.Collection) {
 	}
 	bot.Handle(getEchoHandler(responseCallback))
 	bot.Handle(getAddStockHandler(responseCallback, collection))
+	bot.Handle(getListStockHandler(responseCallback, collection))
 }
