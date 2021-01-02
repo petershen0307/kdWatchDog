@@ -28,5 +28,5 @@ func New(configs config.Config) *tg.Bot {
 }
 
 func registerHandlers(bot *tg.Bot) {
-	bot.Handle(tg.OnText, getEchoHandler(bot))
+	bot.Handle(getEchoHandler(bot))
 }

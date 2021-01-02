@@ -1,9 +1,17 @@
 package bot
 
-import tg "gopkg.in/tucnak/telebot.v2"
+import (
+	"fmt"
 
-func getEchoHandler(bot *tg.Bot) func(m *tg.Message) {
-	return func(m *tg.Message) {
-		bot.Send(m.Sender, "Echo "+m.Text)
+	tg "gopkg.in/tucnak/telebot.v2"
+)
+
+func getEchoHandler(bot *tg.Bot) (string, func(*tg.Message)) {
+	return tg.OnText, func(m *tg.Message) {
+		bot.Send(m.Sender, echo(m.Text))
 	}
+}
+
+func echo(msg string) string {
+	return fmt.Sprintf("Echo %v", msg)
 }
