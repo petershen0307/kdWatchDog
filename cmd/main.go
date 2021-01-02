@@ -1,37 +1,31 @@
 package main
 
 import (
+	"context"
 	"log"
-	"os"
 
-	tb "gopkg.in/tucnak/telebot.v2"
+	"github.com/petershen0307/kdWatchDog/bot"
+	"github.com/petershen0307/kdWatchDog/config"
+	"github.com/petershen0307/kdWatchDog/handlers"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	var (
-		herokuPort = os.Getenv("PORT")
-		herokuURL  = os.Getenv("HEROKU_URL")
-		tgToken    = os.Getenv("TG_TOKEN")
-	)
+	configs := config.Get()
 
-	webhook := &tb.Webhook{
-		Listen:   ":" + herokuPort,
-		Endpoint: &tb.WebhookEndpoint{PublicURL: herokuURL},
-	}
+	tgBot := bot.New(*configs)
 
-	pref := tb.Settings{
-		Token:  tgToken,
-		Poller: webhook,
-	}
-
-	b, err := tb.NewBot(pref)
+	// Set client options
+	clientOptions := options.Client().ApplyURI(configs.MongoDBURI)
+	// Connect to MongoDB
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
+	collection := client.Database(configs.DBName).Collection("users")
 
-	b.Handle(tb.OnText, func(m *tb.Message) {
-		b.Send(m.Sender, "Echo "+m.Text)
-	})
-
-	b.Start()
+	handlers.RegisterHandlers(tgBot, collection)
+	tgBot.Start()
 }
