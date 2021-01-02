@@ -8,6 +8,7 @@ type Config struct {
 	HerokuURL  string
 	TgToken    string
 	MongoDBURI string
+	DBName     string
 }
 
 // Get the configuration from environment variable
@@ -17,5 +18,6 @@ func Get() *Config {
 		HerokuURL:  os.Getenv("HEROKU_URL"),
 		TgToken:    os.Getenv("TG_TOKEN"),
 		MongoDBURI: os.Getenv("MONGODB_URI"),
+		DBName:     "kdWatchDog",
 	}
 }
