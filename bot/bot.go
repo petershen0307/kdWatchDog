@@ -7,6 +7,12 @@ import (
 	tg "gopkg.in/tucnak/telebot.v2"
 )
 
+type responseMessage struct {
+	to      tg.Recipient
+	what    interface{}
+	options []interface{}
+}
+
 // New a webhook server telegram bot
 func New(configs config.Config) *tg.Bot {
 	webhook := &tg.Webhook{
@@ -28,5 +34,8 @@ func New(configs config.Config) *tg.Bot {
 }
 
 func registerHandlers(bot *tg.Bot) {
-	bot.Handle(getEchoHandler(bot))
+	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
+		bot.Send(to, what, options...)
+	}
+	bot.Handle(getEchoHandler(responseCallback))
 }
