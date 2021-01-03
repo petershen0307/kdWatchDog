@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/petershen0307/kdWatchDog/models"
 	"github.com/petershen0307/kdWatchDog/test"
@@ -80,7 +79,6 @@ func (s *listHandleTestSuite) Test_getListStockHandler_expectStockList() {
 		}, options.Update().SetUpsert(true))
 	assert.NoError(s.T(), err)
 	sort.Strings(mockUser.Stocks)
-	time.Sleep(2 * time.Second)
 
 	// act
 	command, f := getListStockHandler(responseCallback, s.collection)
