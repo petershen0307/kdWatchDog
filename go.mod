@@ -1,6 +1,7 @@
+// +heroku goVersion go1.15
 module github.com/petershen0307/kdWatchDog
 
-go 1.14
+go 1.15
 
 require (
 	github.com/stretchr/testify v1.6.1
