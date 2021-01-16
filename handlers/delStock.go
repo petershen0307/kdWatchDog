@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/petershen0307/kdWatchDog/models"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,6 +50,7 @@ func getDelStockHandler(responseCallback responseCallbackFunc, collection *mongo
 		if removeIndex != -1 {
 			queryUser.Stocks = append(queryUser.Stocks[0:removeIndex], queryUser.Stocks[removeIndex+1:]...)
 		}
+		queryUser.LastUpdate = time.Now().UTC()
 		_, err = collection.UpdateOne(context.Background(), bson.M{"user_id": m.Sender.ID}, bson.M{"$set": queryUser},
 			options.Update().SetUpsert(true))
 		if err != nil {

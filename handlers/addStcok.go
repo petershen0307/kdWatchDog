@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/petershen0307/kdWatchDog/models"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -56,6 +57,7 @@ func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo
 		if updateDB {
 			user.UserID = m.Sender.ID
 			user.Stocks = append(user.Stocks, stockID)
+			user.LastUpdate = time.Now().UTC()
 			_, err = collection.UpdateOne(context.Background(), bson.M{"user_id": m.Sender.ID}, bson.M{"$set": user}, options.Update().SetUpsert(true))
 			if err != nil {
 				*responseMsg = fmt.Sprintf("Add stock fail (%v)", err)
