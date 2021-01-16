@@ -19,6 +19,7 @@ func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo
 	return addCommand, func(m *tg.Message) {
 		stockID := strings.Replace(m.Text, addCommand, "", 1)
 		stockID = strings.TrimSpace(stockID)
+		stockID = strings.ToUpper(stockID)
 		var responseMsg *string = new(string)
 		*responseMsg = fmt.Sprintf("add %v ok", stockID)
 
