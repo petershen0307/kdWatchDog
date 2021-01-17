@@ -9,7 +9,7 @@ import (
 )
 
 func TestAlphavantageAPISuite(t *testing.T) {
-	//t.Skip()
+	t.Skip()
 	suite.Run(t, new(alphavantageAPITestSuite))
 }
 

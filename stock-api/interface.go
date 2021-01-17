@@ -3,6 +3,7 @@ package stockapi
 import "github.com/petershen0307/kdWatchDog/models"
 
 type stockAPI interface {
+	Wait()
 	GetStockSymbol(exchange string) []string
 	GetSTOCH(symbol string, interval ResolutionInterval, fastkperiod, slowkperiod, slowdperiod, slowkmatype, slowdmatype uint8) models.STOCH
 	GetDailyPrice(symbol string) models.Price
