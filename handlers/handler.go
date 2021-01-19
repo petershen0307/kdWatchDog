@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/petershen0307/kdWatchDog/config"
+	"github.com/petershen0307/kdWatchDog/db"
 	tg "gopkg.in/tucnak/telebot.v2"
 )
 
 type responseCallbackFunc func(tg.Recipient, interface{}, ...interface{})
 
 // RegisterHandlers register bot handers
-func RegisterHandlers(bot *tg.Bot, collection *mongo.Collection) {
+func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
 		switch object := what.(type) {
 		case *string:
@@ -17,8 +18,9 @@ func RegisterHandlers(bot *tg.Bot, collection *mongo.Collection) {
 			bot.Send(to, object, options...)
 		}
 	}
+	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
 	bot.Handle(getEchoHandler(responseCallback))
-	bot.Handle(getAddStockHandler(responseCallback, collection))
-	bot.Handle(getListStockHandler(responseCallback, collection))
-	bot.Handle(getDelStockHandler(responseCallback, collection))
+	bot.Handle(getAddStockHandler(responseCallback, userColl))
+	bot.Handle(getListStockHandler(responseCallback, userColl))
+	bot.Handle(getDelStockHandler(responseCallback, userColl))
 }
