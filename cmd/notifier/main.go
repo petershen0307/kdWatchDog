@@ -35,7 +35,7 @@ func main() {
 		stockMap[stock.ID] = stock
 	}
 	bot := bot.New(*configs)
-	prefixMsg := "stockID    close    dailyK    dailyD    weeklyK    weeklyD    monthlyK    monthlyD"
+	prefixMsg := "stockID    close    dailyK    dailyD    weeklyK    weeklyD    monthlyK    monthlyD\n"
 	for _, user := range allUsers {
 		msg := prefixMsg
 		for _, stockID := range user.Stocks {
