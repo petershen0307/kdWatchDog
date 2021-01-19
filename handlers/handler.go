@@ -20,8 +20,10 @@ func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 		bot.Send(p.to, p.what, p.options...)
 	}
 	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
+	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "stocks")
 	bot.Handle(getEchoHandler(responseCallback))
 	bot.Handle(getAddStockHandler(responseCallback, userColl))
 	bot.Handle(getListStockHandler(responseCallback, userColl))
 	bot.Handle(getDelStockHandler(responseCallback, userColl))
+	bot.Handle(getQueryStockHandler(responseCallback, userColl, stockColl))
 }
