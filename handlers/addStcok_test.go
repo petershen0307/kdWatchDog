@@ -44,8 +44,8 @@ func (s *addHandleTestSuite) TearDownTest() {
 func (s *addHandleTestSuite) Test_getAddStockHandler_oneData() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	stockID := "1234"
 	userID := 5566
@@ -67,8 +67,8 @@ func (s *addHandleTestSuite) Test_getAddStockHandler_oneData() {
 func (s *addHandleTestSuite) Test_getAddStockHandler_sameUserSecondData() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	stockID := "12345"
 	userID := 7788
@@ -98,8 +98,8 @@ func (s *addHandleTestSuite) Test_getAddStockHandler_sameUserSecondData() {
 func (s *addHandleTestSuite) Test_getAddStockHandler_invalidStockID() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	stockID := ""
 	userID := 5566

@@ -15,24 +15,29 @@ const queryCommand = "/query"
 
 func getQueryStockHandler(responseCallback responseCallbackFunc, userColl, stockColl *mongo.Collection) (string, func(*tg.Message)) {
 	return queryCommand, func(m *tg.Message) {
-		var responseMsg *string = new(string)
-
-		defer responseCallback(m.Sender, responseMsg)
+		var p *post = &post{
+			to:      m.Sender,
+			what:    "no data",
+			options: []interface{}{},
+		}
+		defer responseCallback(p)
 
 		// query all user
 		var user models.User
 		if err := userColl.FindOne(context.Background(), bson.M{"user_id": m.Sender.ID}).Decode(&user); err != nil {
 			log.Printf("connect to db err=%v", err)
-			*responseMsg = "connect user collection failed"
+			p.what = "connect user collection failed"
 			return
 		}
 
 		stockMap := GetStockMap(stockColl)
 		if stockMap == nil {
-			*responseMsg = "connect user collection failed"
+			p.what = "connect user collection failed"
 			return
 		}
-		*responseMsg = RenderOneUserOutput(&user, stockMap)
+		msg, tgParseMode := RenderOneUserOutput(&user, stockMap)
+		p.what = msg
+		p.options = append(p.options, tgParseMode)
 	}
 }
 
@@ -56,10 +61,15 @@ func GetStockMap(stockColl *mongo.Collection) map[string]models.StockInfo {
 }
 
 // RenderOneUserOutput render one user stock info
-func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo) string {
-	responseMsg := "stockID    close    dailyK    dailyD    weeklyK    weeklyD    monthlyK    monthlyD\n"
+func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo) (string, tg.ParseMode) {
+	responseMsg := fmt.Sprint(
+		"| stockID   | close     | dayK      | dayD      | weekK     | weekD | monthK | monthD |\n",
+		"|:----------|:----------|:----------|:----------|:----------|:------|:-------|:-------|\n",
+	)
+
 	for _, stockID := range user.Stocks {
-		responseMsg += fmt.Sprintf("%v    %v    %v    %v    %v    %v    %v    %v\n", stockID,
+		responseMsg += fmt.Sprintf("| %v | %v | %v | %v | %v | %v | %v | %v |\n",
+			stockID,
 			stockMap[stockID].DailyPrice.Close,
 			stockMap[stockID].DailyKD.K,
 			stockMap[stockID].DailyKD.D,
@@ -68,5 +78,5 @@ func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo
 			stockMap[stockID].MonthlyKD.K,
 			stockMap[stockID].MonthlyKD.D)
 	}
-	return responseMsg
+	return responseMsg, tg.ModeMarkdown
 }

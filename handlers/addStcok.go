@@ -21,14 +21,15 @@ func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo
 		stockID := strings.Replace(m.Text, addCommand, "", 1)
 		stockID = strings.TrimSpace(stockID)
 		stockID = strings.ToUpper(stockID)
-		var responseMsg *string = new(string)
-		*responseMsg = fmt.Sprintf("add %v ok", stockID)
-
-		defer responseCallback(m.Sender, responseMsg)
+		var p *post = &post{
+			to:   m.Sender,
+			what: fmt.Sprintf("add %v ok", stockID),
+		}
+		defer responseCallback(p)
 
 		if err := stockIDValidator(stockID); err != nil {
 			log.Printf("user(%v) insert invalid stock id(%v) err = %v", m.Sender.ID, stockID, err)
-			*responseMsg = "invalid stock id"
+			p.what = "invalid stock id"
 			return
 		}
 
@@ -40,7 +41,7 @@ func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo
 			if err == mongo.ErrNoDocuments {
 				updateDB = true
 			} else {
-				*responseMsg = fmt.Sprintf("Add stock (%v) with err = %v", stockID, err)
+				p.what = fmt.Sprintf("Add stock (%v) with err = %v", stockID, err)
 				log.Printf("Add stock for user(%v) with err = %v", m.Sender.ID, err)
 				return
 			}
@@ -60,7 +61,7 @@ func getAddStockHandler(responseCallback responseCallbackFunc, collection *mongo
 			user.LastUpdate = time.Now().UTC()
 			_, err = collection.UpdateOne(context.Background(), bson.M{"user_id": m.Sender.ID}, bson.M{"$set": user}, options.Update().SetUpsert(true))
 			if err != nil {
-				*responseMsg = fmt.Sprintf("Add stock fail (%v)", err)
+				p.what = fmt.Sprintf("Add stock fail (%v)", err)
 			}
 		}
 	}

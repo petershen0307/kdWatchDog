@@ -33,7 +33,7 @@ func main() {
 	stockMap := handlers.GetStockMap(stockColl)
 	bot := bot.New(*configs)
 	for _, user := range allUsers {
-		msg := handlers.RenderOneUserOutput(&user, stockMap)
-		bot.Send(&tg.User{ID: user.UserID}, msg)
+		msg, mode := handlers.RenderOneUserOutput(&user, stockMap)
+		bot.Send(&tg.User{ID: user.UserID}, msg, mode)
 	}
 }

@@ -16,10 +16,11 @@ const listCommand = "/list"
 
 func getListStockHandler(responseCallback responseCallbackFunc, collection *mongo.Collection) (string, func(*tg.Message)) {
 	return listCommand, func(m *tg.Message) {
-		var responseMsg *string = new(string)
-		*responseMsg = "no data"
-
-		defer responseCallback(m.Sender, responseMsg)
+		var p *post = &post{
+			to:   m.Sender,
+			what: "no data",
+		}
+		defer responseCallback(p)
 
 		queryUser := models.User{}
 		err := collection.FindOne(
@@ -30,7 +31,7 @@ func getListStockHandler(responseCallback responseCallbackFunc, collection *mong
 			return
 		}
 		if err != nil {
-			*responseMsg = err.Error()
+			p.what = err.Error()
 			log.Printf("Query user(%v) with err = %v", m.Sender.ID, err)
 			return
 		}
@@ -38,6 +39,6 @@ func getListStockHandler(responseCallback responseCallbackFunc, collection *mong
 		// [ToDo] add stock name and region(tw, us)
 		// Region ID Name
 		sort.Strings(queryUser.Stocks)
-		*responseMsg = strings.Join(queryUser.Stocks, "\n")
+		p.what = strings.Join(queryUser.Stocks, "\n")
 	}
 }

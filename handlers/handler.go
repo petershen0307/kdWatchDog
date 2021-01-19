@@ -6,17 +6,18 @@ import (
 	tg "gopkg.in/tucnak/telebot.v2"
 )
 
-type responseCallbackFunc func(tg.Recipient, interface{}, ...interface{})
+type responseCallbackFunc func(*post)
+
+type post struct {
+	to      tg.Recipient
+	what    interface{}
+	options []interface{}
+}
 
 // RegisterHandlers register bot handers
 func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		switch object := what.(type) {
-		case *string:
-			bot.Send(to, *object, options...)
-		default:
-			bot.Send(to, object, options...)
-		}
+	responseCallback := func(p *post) {
+		bot.Send(p.to, p.what, p.options...)
 	}
 	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
 	bot.Handle(getEchoHandler(responseCallback))
