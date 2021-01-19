@@ -45,8 +45,8 @@ func (s *listHandleTestSuite) TearDownTest() {
 func (s *listHandleTestSuite) Test_getListStockHandler_noData() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	userID := 5566
 
@@ -66,8 +66,8 @@ func (s *listHandleTestSuite) Test_getListStockHandler_noData() {
 func (s *listHandleTestSuite) Test_getListStockHandler_expectStockList() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	mockUser := models.User{
 		UserID: 7788,

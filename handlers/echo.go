@@ -6,11 +6,12 @@ import (
 	tg "gopkg.in/tucnak/telebot.v2"
 )
 
-func getEchoHandler(responseCallback func(tg.Recipient, interface{}, ...interface{})) (string, func(*tg.Message)) {
+func getEchoHandler(responseCallback responseCallbackFunc) (string, func(*tg.Message)) {
 	return tg.OnText, func(m *tg.Message) {
 		responseCallback(
-			m.Sender,
-			fmt.Sprintf("Echo %v", m.Text),
-		)
+			&post{
+				to:   m.Sender,
+				what: fmt.Sprintf("Echo %v", m.Text),
+			})
 	}
 }

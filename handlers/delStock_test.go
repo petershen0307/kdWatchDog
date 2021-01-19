@@ -45,8 +45,8 @@ func (s *delHandleTestSuite) TearDownTest() {
 func (s *delHandleTestSuite) Test_getDelStockHandler_delNone() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	stockID := "1234"
 	userID := 5566
@@ -68,8 +68,8 @@ func (s *delHandleTestSuite) Test_getDelStockHandler_delNone() {
 func (s *delHandleTestSuite) Test_getDelStockHandler_delOne() {
 	// arrange
 	gotValue := ""
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		gotValue = *what.(*string)
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	mockUser := models.User{
 		UserID: 7788,
@@ -95,8 +95,9 @@ func (s *delHandleTestSuite) Test_getDelStockHandler_delOne() {
 	err = s.collection.FindOne(context.Background(), bson.M{"user_id": mockUser.UserID}).Decode(&actualResult)
 	sort.Strings(actualResult.Stocks)
 	expectResult := models.User{
-		UserID: 7788,
-		Stocks: []string{"2330", "aapl"},
+		UserID:     7788,
+		Stocks:     []string{"2330", "aapl"},
+		LastUpdate: actualResult.LastUpdate,
 	}
 	sort.Strings(expectResult.Stocks)
 	assert.NoError(s.T(), err)

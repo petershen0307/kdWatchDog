@@ -20,10 +20,11 @@ func getDelStockHandler(responseCallback responseCallbackFunc, collection *mongo
 	return delCommand, func(m *tg.Message) {
 		stockID := strings.Replace(m.Text, delCommand, "", 1)
 		stockID = strings.TrimSpace(stockID)
-		var responseMsg *string = new(string)
-		*responseMsg = "success"
-
-		defer responseCallback(m.Sender, responseMsg)
+		var p *post = &post{
+			to:   m.Sender,
+			what: "success",
+		}
+		defer responseCallback(p)
 
 		queryUser := models.User{}
 		err := collection.FindOne(
@@ -31,11 +32,11 @@ func getDelStockHandler(responseCallback responseCallbackFunc, collection *mongo
 			bson.M{"user_id": m.Sender.ID},
 		).Decode(&queryUser)
 		if err == mongo.ErrNoDocuments {
-			*responseMsg = "no record"
+			p.what = "no record"
 			return
 		}
 		if err != nil {
-			*responseMsg = err.Error()
+			p.what = err.Error()
 			log.Printf("Query user(%v) with err = %v", m.Sender.ID, err)
 			return
 		}
@@ -54,7 +55,7 @@ func getDelStockHandler(responseCallback responseCallbackFunc, collection *mongo
 		_, err = collection.UpdateOne(context.Background(), bson.M{"user_id": m.Sender.ID}, bson.M{"$set": queryUser},
 			options.Update().SetUpsert(true))
 		if err != nil {
-			*responseMsg = fmt.Sprintf("Delete stock(%v) fail (%v)", stockID, err)
+			p.what = fmt.Sprintf("Delete stock(%v) fail (%v)", stockID, err)
 		}
 	}
 }

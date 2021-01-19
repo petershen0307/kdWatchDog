@@ -7,10 +7,9 @@ import (
 )
 
 func Test_getEchoHandler(t *testing.T) {
-	responseCallback := func(to tg.Recipient, what interface{}, options ...interface{}) {
-		if what != "Echo Hello" {
-			t.Fatalf("Got wrong msg (%v)", what)
-		}
+	gotValue := ""
+	responseCallback := func(p *post) {
+		gotValue = p.what.(string)
 	}
 	command, callback := getEchoHandler(responseCallback)
 	if command != tg.OnText {
@@ -18,4 +17,7 @@ func Test_getEchoHandler(t *testing.T) {
 	}
 
 	callback(&tg.Message{Text: "Hello"})
+	if gotValue != "Echo Hello" {
+		t.Fatalf("Got wrong msg (%v)", gotValue)
+	}
 }
