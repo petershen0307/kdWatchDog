@@ -17,7 +17,12 @@ type post struct {
 // RegisterHandlers register bot handers
 func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 	responseCallback := func(p *post) {
-		bot.Send(p.to, p.what, p.options...)
+		switch p.what.(type) {
+		case string:
+			bot.Send(p.to, p.what, p.options...)
+		case tg.Photo:
+			bot.SendAlbum(p.to, tg.Album{p.what.(*tg.Photo)})
+		}
 	}
 	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
 	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "stocks")

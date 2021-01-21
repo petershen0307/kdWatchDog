@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/petershen0307/kdWatchDog/models"
+	tableimage "github.com/petershen0307/kdWatchDog/table-image"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/mgo.v2/bson"
 	tg "gopkg.in/tucnak/telebot.v2"
@@ -35,9 +36,8 @@ func getQueryStockHandler(responseCallback responseCallbackFunc, userColl, stock
 			p.what = "connect user collection failed"
 			return
 		}
-		msg, tgParseMode := RenderOneUserOutput(&user, stockMap)
-		p.what = msg
-		p.options = append(p.options, tgParseMode)
+		msg := RenderOneUserOutput(&user, stockMap)
+		p.what = &tg.Photo{File: tg.FromReader(msg)}
 	}
 }
 
@@ -61,22 +61,87 @@ func GetStockMap(stockColl *mongo.Collection) map[string]models.StockInfo {
 }
 
 // RenderOneUserOutput render one user stock info
-func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo) (string, tg.ParseMode) {
-	responseMsg := fmt.Sprint(
-		"| stockID   | close     | dayK      | dayD      | weekK     | weekD | monthK | monthD |\n",
-		"|:----------|:----------|:----------|:----------|:----------|:------|:-------|:-------|\n",
+func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo) *bytes.Buffer {
+	ti := tableimage.Init("#fff", tableimage.PNG, "")
+	ti.AddTH(
+		tableimage.TR{
+			BorderColor: "#000",
+			Tds: []tableimage.TD{
+				{
+					Color: "#000",
+					Text:  "stockID",
+				},
+				{
+					Color: "#000",
+					Text:  "close",
+				},
+				{
+					Color: "#008000",
+					Text:  "dayK",
+				},
+				{
+					Color: "#008000",
+					Text:  "dayD",
+				},
+				{
+					Color: "#008000",
+					Text:  "weekK",
+				},
+				{
+					Color: "#008000",
+					Text:  "weekD",
+				},
+				{
+					Color: "#008000",
+					Text:  "monthK",
+				},
+				{
+					Color: "#008000",
+					Text:  "monthD",
+				},
+			},
+		},
 	)
-
+	trList := []tableimage.TR{}
 	for _, stockID := range user.Stocks {
-		responseMsg += fmt.Sprintf("| %v | %v | %v | %v | %v | %v | %v | %v |\n",
-			stockID,
-			stockMap[stockID].DailyPrice.Close,
-			stockMap[stockID].DailyKD.K,
-			stockMap[stockID].DailyKD.D,
-			stockMap[stockID].WeeklyKD.K,
-			stockMap[stockID].WeeklyKD.D,
-			stockMap[stockID].MonthlyKD.K,
-			stockMap[stockID].MonthlyKD.D)
+		trList = append(trList, tableimage.TR{
+			BorderColor: "#000",
+			Tds: []tableimage.TD{
+				{
+					Color: "#000",
+					Text:  stockID,
+				},
+				{
+					Color: "#000",
+					Text:  stockMap[stockID].DailyPrice.Close,
+				},
+				{
+					Color: "#008000",
+					Text:  stockMap[stockID].DailyKD.K,
+				},
+				{
+					Color: "#008000",
+					Text:  stockMap[stockID].DailyKD.D,
+				},
+				{
+					Color: "#008000",
+					Text:  stockMap[stockID].WeeklyKD.K,
+				},
+				{
+					Color: "#008000",
+					Text:  stockMap[stockID].WeeklyKD.D,
+				},
+				{
+					Color: "#008000",
+					Text:  stockMap[stockID].MonthlyKD.K,
+				},
+				{
+					Color: "#008000",
+					Text:  stockMap[stockID].MonthlyKD.D,
+				},
+			},
+		})
 	}
-	return responseMsg, tg.ModeMarkdown
+	ti.AddTRs(trList)
+	return ti.Get()
 }
