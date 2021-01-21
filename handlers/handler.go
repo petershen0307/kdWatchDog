@@ -20,7 +20,7 @@ func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 		switch p.what.(type) {
 		case string:
 			bot.Send(p.to, p.what, p.options...)
-		case tg.Photo:
+		case *tg.Photo:
 			bot.SendAlbum(p.to, tg.Album{p.what.(*tg.Photo)})
 		}
 	}
