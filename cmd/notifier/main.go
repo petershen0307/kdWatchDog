@@ -8,6 +8,7 @@ import (
 	"github.com/petershen0307/kdWatchDog/config"
 	"github.com/petershen0307/kdWatchDog/db"
 	"github.com/petershen0307/kdWatchDog/handlers"
+	"github.com/petershen0307/kdWatchDog/imgur"
 	"github.com/petershen0307/kdWatchDog/models"
 	"gopkg.in/mgo.v2/bson"
 	tg "gopkg.in/tucnak/telebot.v2"
@@ -33,7 +34,12 @@ func main() {
 	stockMap := handlers.GetStockMap(stockColl)
 	bot := bot.New(*configs)
 	for _, user := range allUsers {
-		msg, mode := handlers.RenderOneUserOutput(&user, stockMap)
-		bot.Send(&tg.User{ID: user.UserID}, msg, mode)
+		msg := handlers.RenderOneUserOutput(&user, stockMap)
+		// upload to imgur
+		link, err := imgur.UploadImage(configs.ImgurClientID, msg.Bytes())
+		if err != nil {
+			log.Fatalf("upload image with error=%v", err)
+		}
+		bot.Send(&tg.User{ID: user.UserID}, link)
 	}
 }
