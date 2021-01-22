@@ -1,14 +1,16 @@
-package imgur
+package imgur_test
 
 import (
 	"testing"
 
 	"github.com/petershen0307/kdWatchDog/handlers"
+	"github.com/petershen0307/kdWatchDog/imgur"
 	"github.com/petershen0307/kdWatchDog/models"
 	"github.com/stretchr/testify/suite"
 )
 
 func TestAPISuiteSuite(t *testing.T) {
+	t.Skip()
 	suite.Run(t, new(apiSuite))
 }
 
@@ -52,7 +54,7 @@ func (s *apiSuite) TearDownSuite() {
 
 func (s *apiSuite) Test_UpdloadImage_success() {
 	image := handlers.RenderOneUserOutput(&s.user, s.stockMap)
-	imageLink, err := UploadImage(s.clientID, image.Bytes())
+	imageLink, err := imgur.UploadImage(s.clientID, image.Bytes())
 	s.NoError(err)
 	s.NotEmpty(imageLink)
 }
