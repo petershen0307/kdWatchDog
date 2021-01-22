@@ -30,5 +30,5 @@ func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 	bot.Handle(getAddStockHandler(responseCallback, userColl))
 	bot.Handle(getListStockHandler(responseCallback, userColl))
 	bot.Handle(getDelStockHandler(responseCallback, userColl))
-	bot.Handle(getQueryStockHandler(responseCallback, userColl, stockColl))
+	bot.Handle(getQueryStockHandler(responseCallback, userColl, stockColl, configs.ImgurClientID))
 }

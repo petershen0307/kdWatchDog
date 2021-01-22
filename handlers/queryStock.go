@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/petershen0307/kdWatchDog/imgur"
 	"github.com/petershen0307/kdWatchDog/models"
 	tableimage "github.com/petershen0307/kdWatchDog/table-image"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,7 @@ import (
 
 const queryCommand = "/query"
 
-func getQueryStockHandler(responseCallback responseCallbackFunc, userColl, stockColl *mongo.Collection) (string, func(*tg.Message)) {
+func getQueryStockHandler(responseCallback responseCallbackFunc, userColl, stockColl *mongo.Collection, imgurClientID string) (string, func(*tg.Message)) {
 	return queryCommand, func(m *tg.Message) {
 		var p *post = &post{
 			to:      m.Sender,
@@ -37,7 +38,9 @@ func getQueryStockHandler(responseCallback responseCallbackFunc, userColl, stock
 			return
 		}
 		msg := RenderOneUserOutput(&user, stockMap)
-		p.what = &tg.Photo{File: tg.FromReader(msg)}
+		// upload to imgur
+		link, _ := imgur.UploadImage(imgurClientID, msg.Bytes())
+		p.what = link
 	}
 }
 
