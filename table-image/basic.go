@@ -5,7 +5,7 @@ import (
 	"image/draw"
 
 	"golang.org/x/image/font"
-	"golang.org/x/image/font/basicfont"
+	"golang.org/x/image/font/inconsolata"
 	"golang.org/x/image/math/fixed"
 )
 
@@ -18,12 +18,12 @@ func (ti *tableImage) setRgba() {
 
 func (ti *tableImage) addString(x, y int, label string, color string) {
 
-	point := fixed.Point26_6{fixed.Int26_6(x * 64), fixed.Int26_6(y * 64)}
+	point := fixed.Point26_6{X: fixed.Int26_6(x * 64), Y: fixed.Int26_6(y * 64)}
 
 	d := &font.Drawer{
 		Dst:  ti.img,
 		Src:  image.NewUniform(getColorByHex(color)),
-		Face: basicfont.Face7x13,
+		Face: inconsolata.Bold8x16, //basicfont.Face7x13,
 		Dot:  point,
 	}
 	d.DrawString(label)

@@ -32,14 +32,16 @@ type tableImage struct {
 }
 
 const (
-	rowSpace                  = 26
-	tablePadding              = 20
-	letterPerPx               = 10
-	separatorPadding          = 10
-	wrapWordsLen              = 20
-	columnSpace               = wrapWordsLen * letterPerPx
-	PNG              FileType = "png"
-	JPEG             FileType = "jpg"
+	rowSpace         = 26
+	tablePadding     = 20
+	letterPerPx      = 10
+	separatorPadding = 10
+	wrapWordsLen     = 20
+	columnSpace      = wrapWordsLen * letterPerPx
+	// PNG is a png image format
+	PNG FileType = "png"
+	// JPEG is a jpg image format
+	JPEG FileType = "jpg"
 )
 
 //Init initialise the table image receiver
@@ -76,6 +78,7 @@ func (ti *tableImage) Save() {
 	ti.saveFile()
 }
 
+// Get return table image in memory bytes
 func (ti *tableImage) Get() *bytes.Buffer {
 	ti.calculateHeight()
 	ti.calculateWidth()

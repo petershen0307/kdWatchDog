@@ -1,27 +1,26 @@
-package imgur_test
+package handlers
 
 import (
+	"io/ioutil"
 	"testing"
 
-	"github.com/petershen0307/kdWatchDog/handlers"
-	"github.com/petershen0307/kdWatchDog/imgur"
 	"github.com/petershen0307/kdWatchDog/models"
 	"github.com/stretchr/testify/suite"
 )
 
-func TestAPISuite(t *testing.T) {
+func TestRenderSuite(t *testing.T) {
 	t.Skip()
-	suite.Run(t, new(apiSuite))
+	suite.Run(t, new(renderSuite))
 }
 
-type apiSuite struct {
+type renderSuite struct {
 	suite.Suite
 	clientID string
 	user     models.User
 	stockMap map[string]models.StockInfo
 }
 
-func (s *apiSuite) SetupSuite() {
+func (s *renderSuite) SetupSuite() {
 	s.clientID = ""
 	s.user = models.User{
 		Stocks: []string{"AAPL", "DDOG", "LMT"},
@@ -48,13 +47,11 @@ func (s *apiSuite) SetupSuite() {
 	}
 }
 
-func (s *apiSuite) TearDownSuite() {
+func (s *renderSuite) TearDownSuite() {
 
 }
 
-func (s *apiSuite) Test_UpdloadImage_success() {
-	image := handlers.RenderOneUserOutput(&s.user, s.stockMap)
-	imageLink, err := imgur.UploadImage(s.clientID, image.Bytes())
-	s.NoError(err)
-	s.NotEmpty(imageLink)
+func (s *renderSuite) Test_UpdloadImage_success() {
+	image := RenderOneUserOutput(&s.user, s.stockMap)
+	ioutil.WriteFile("test.png", image.Bytes(), 0755)
 }
