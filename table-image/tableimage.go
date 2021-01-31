@@ -2,7 +2,12 @@ package tableimage
 
 import (
 	"bytes"
+	"encoding/base64"
 	"image"
+	"log"
+
+	"github.com/golang/freetype/truetype"
+	"golang.org/x/image/font"
 )
 
 //FileType the image format png or jpg
@@ -29,12 +34,13 @@ type tableImage struct {
 	fileType        FileType
 	filePath        string
 	img             *image.RGBA
+	firacode        font.Face
 }
 
 const (
-	rowSpace         = 26
-	tablePadding     = 20
-	letterPerPx      = 10
+	rowSpace         = 36
+	tablePadding     = 12
+	letterPerPx      = 12
 	separatorPadding = 10
 	wrapWordsLen     = 20
 	columnSpace      = wrapWordsLen * letterPerPx
@@ -46,10 +52,19 @@ const (
 
 //Init initialise the table image receiver
 func Init(backgroundColor string, fileType FileType, filePath string) tableImage {
+	firacodeBin, _ := base64.StdEncoding.DecodeString(firacodeTTF)
+	f, err := truetype.Parse(firacodeBin)
+	if err != nil {
+		log.Fatal(err)
+	}
 	ti := tableImage{
 		backgroundColor: backgroundColor,
 		fileType:        fileType,
 		filePath:        filePath,
+		firacode: truetype.NewFace(f, &truetype.Options{
+			Size: 24,
+			DPI:  72,
+		}),
 	}
 	ti.setRgba()
 	return ti

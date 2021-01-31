@@ -5,7 +5,6 @@ import (
 	"image/draw"
 
 	"golang.org/x/image/font"
-	"golang.org/x/image/font/inconsolata"
 	"golang.org/x/image/math/fixed"
 )
 
@@ -23,7 +22,7 @@ func (ti *tableImage) addString(x, y int, label string, color string) {
 	d := &font.Drawer{
 		Dst:  ti.img,
 		Src:  image.NewUniform(getColorByHex(color)),
-		Face: inconsolata.Bold8x16, //basicfont.Face7x13,
+		Face: ti.firacode, //basicfont.Face7x13, inconsolata.Bold8x16
 		Dot:  point,
 	}
 	d.DrawString(label)
