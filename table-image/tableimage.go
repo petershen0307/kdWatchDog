@@ -25,6 +25,7 @@ type TR struct {
 	Tds         []TD
 }
 
+//TableImage is the structure for image table
 type TableImage struct {
 	width           int
 	height          int
