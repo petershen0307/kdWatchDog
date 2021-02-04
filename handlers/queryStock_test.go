@@ -27,19 +27,19 @@ func (s *renderSuite) SetupSuite() {
 	}
 	s.stockMap = map[string]models.StockInfo{
 		"AAPL": {
-			DailyPrice: models.Price{Close: "100.00000"},
+			DailyPrice: models.Price{Close: "100.0000"},
 			DailyKD:    models.STOCH{K: "1", D: "2"},
-			WeeklyKD:   models.STOCH{K: "3", D: "4"},
-			MonthlyKD:  models.STOCH{K: "5", D: "6"},
+			WeeklyKD:   models.STOCH{K: "39", D: "94"},
+			MonthlyKD:  models.STOCH{K: "95", D: "6"},
 		},
 		"DDOG": {
-			DailyPrice: models.Price{Close: "200"},
+			DailyPrice: models.Price{Close: "2000.0000"},
 			DailyKD:    models.STOCH{K: "12", D: "22"},
-			WeeklyKD:   models.STOCH{K: "32", D: "42"},
+			WeeklyKD:   models.STOCH{K: "82", D: "42"},
 			MonthlyKD:  models.STOCH{K: "52", D: "62"},
 		},
 		"LMT": {
-			DailyPrice: models.Price{Close: "300"},
+			DailyPrice: models.Price{Close: "30000.0000"},
 			DailyKD:    models.STOCH{K: "13", D: "23"},
 			WeeklyKD:   models.STOCH{K: "33", D: "43"},
 			MonthlyKD:  models.STOCH{K: "53", D: "63"},

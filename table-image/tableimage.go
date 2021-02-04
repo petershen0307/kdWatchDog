@@ -25,7 +25,7 @@ type TR struct {
 	Tds         []TD
 }
 
-type tableImage struct {
+type TableImage struct {
 	width           int
 	height          int
 	th              TR
@@ -38,11 +38,11 @@ type tableImage struct {
 }
 
 const (
-	rowSpace         = 36
-	tablePadding     = 12
-	letterPerPx      = 12
+	rowSpace         = 48
+	tablePadding     = 14
+	letterPerPx      = 24
 	separatorPadding = 10
-	wrapWordsLen     = 20
+	wrapWordsLen     = 12
 	columnSpace      = wrapWordsLen * letterPerPx
 	// PNG is a png image format
 	PNG FileType = "png"
@@ -51,19 +51,19 @@ const (
 )
 
 //Init initialise the table image receiver
-func Init(backgroundColor string, fileType FileType, filePath string) tableImage {
+func Init(backgroundColor string, fileType FileType, filePath string) TableImage {
 	firacodeBin, _ := base64.StdEncoding.DecodeString(firacodeTTF)
 	f, err := truetype.Parse(firacodeBin)
 	if err != nil {
 		log.Fatal(err)
 	}
-	ti := tableImage{
+	ti := TableImage{
 		backgroundColor: backgroundColor,
 		fileType:        fileType,
 		filePath:        filePath,
 		firacode: truetype.NewFace(f, &truetype.Options{
 			Size: 24,
-			DPI:  72,
+			DPI:  96,
 		}),
 	}
 	ti.setRgba()
@@ -71,17 +71,17 @@ func Init(backgroundColor string, fileType FileType, filePath string) tableImage
 }
 
 //AddTH adds the table header
-func (ti *tableImage) AddTH(th TR) {
+func (ti *TableImage) AddTH(th TR) {
 	ti.th = th
 }
 
 //AddTRs add the table rows
-func (ti *tableImage) AddTRs(trs []TR) {
+func (ti *TableImage) AddTRs(trs []TR) {
 	ti.trs = trs
 }
 
 //Save saves the table
-func (ti *tableImage) Save() {
+func (ti *TableImage) Save() {
 	ti.calculateHeight()
 	ti.calculateWidth()
 
@@ -94,7 +94,7 @@ func (ti *tableImage) Save() {
 }
 
 // Get return table image in memory bytes
-func (ti *tableImage) Get() *bytes.Buffer {
+func (ti *TableImage) Get() *bytes.Buffer {
 	ti.calculateHeight()
 	ti.calculateWidth()
 

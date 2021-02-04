@@ -8,14 +8,14 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-func (ti *tableImage) setRgba() {
+func (ti *TableImage) setRgba() {
 	img := image.NewRGBA(image.Rect(0, 0, ti.width, ti.height))
 	//set image background
 	draw.Draw(img, img.Bounds(), &image.Uniform{getColorByHex(ti.backgroundColor)}, image.ZP, draw.Src)
 	ti.img = img
 }
 
-func (ti *tableImage) addString(x, y int, label string, color string) {
+func (ti *TableImage) addString(x, y int, label string, color string) {
 
 	point := fixed.Point26_6{X: fixed.Int26_6(x * 64), Y: fixed.Int26_6(y * 64)}
 
@@ -29,7 +29,7 @@ func (ti *tableImage) addString(x, y int, label string, color string) {
 }
 
 //Thx to https://github.com/StephaneBunel/bresenham
-func (ti *tableImage) addLine(x1, y1, x2, y2 int, color string) {
+func (ti *TableImage) addLine(x1, y1, x2, y2 int, color string) {
 
 	var dx, dy, e, slope int
 	col := getColorByHex(color)

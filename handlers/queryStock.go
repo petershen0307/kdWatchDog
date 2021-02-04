@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"log"
+	"strconv"
 
 	"github.com/petershen0307/kdWatchDog/imgur"
 	"github.com/petershen0307/kdWatchDog/models"
@@ -72,35 +73,35 @@ func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo
 			Tds: []tableimage.TD{
 				{
 					Color: "#000",
-					Text:  "stockID",
+					Text:  "stock ID",
 				},
 				{
 					Color: "#000",
 					Text:  "close",
 				},
 				{
-					Color: "#008000",
-					Text:  "dayK",
+					Color: "#000",
+					Text:  "day K",
 				},
 				{
-					Color: "#008000",
-					Text:  "dayD",
+					Color: "#000",
+					Text:  "day D",
 				},
 				{
-					Color: "#008000",
-					Text:  "weekK",
+					Color: "#000",
+					Text:  "week K",
 				},
 				{
-					Color: "#008000",
-					Text:  "weekD",
+					Color: "#000",
+					Text:  "week D",
 				},
 				{
-					Color: "#008000",
-					Text:  "monthK",
+					Color: "#000",
+					Text:  "month K",
 				},
 				{
-					Color: "#008000",
-					Text:  "monthD",
+					Color: "#000",
+					Text:  "month D",
 				},
 			},
 		},
@@ -118,33 +119,27 @@ func RenderOneUserOutput(user *models.User, stockMap map[string]models.StockInfo
 					Color: "#000",
 					Text:  stockMap[stockID].DailyPrice.Close,
 				},
-				{
-					Color: "#008000",
-					Text:  stockMap[stockID].DailyKD.K,
-				},
-				{
-					Color: "#008000",
-					Text:  stockMap[stockID].DailyKD.D,
-				},
-				{
-					Color: "#008000",
-					Text:  stockMap[stockID].WeeklyKD.K,
-				},
-				{
-					Color: "#008000",
-					Text:  stockMap[stockID].WeeklyKD.D,
-				},
-				{
-					Color: "#008000",
-					Text:  stockMap[stockID].MonthlyKD.K,
-				},
-				{
-					Color: "#008000",
-					Text:  stockMap[stockID].MonthlyKD.D,
-				},
+				getTDByKDValue(stockMap[stockID].DailyKD.K),
+				getTDByKDValue(stockMap[stockID].DailyKD.D),
+				getTDByKDValue(stockMap[stockID].WeeklyKD.K),
+				getTDByKDValue(stockMap[stockID].WeeklyKD.D),
+				getTDByKDValue(stockMap[stockID].MonthlyKD.K),
+				getTDByKDValue(stockMap[stockID].MonthlyKD.D),
 			},
 		})
 	}
 	ti.AddTRs(trList)
 	return ti.Get()
+}
+
+func getTDByKDValue(kdValueStr string) tableimage.TD {
+	kdNum, _ := strconv.ParseFloat(kdValueStr, 32)
+	color := "#000"
+	if kdNum <= 30.0 {
+		color = "#008000"
+	}
+	if kdNum >= 80.0 {
+		color = "#ff0000"
+	}
+	return tableimage.TD{Color: color, Text: kdValueStr}
 }

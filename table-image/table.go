@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func (ti *tableImage) drawTH() {
+func (ti *TableImage) drawTH() {
 	for colNo, td := range ti.th.Tds {
 		ti.addString(colNo*columnSpace+tablePadding, 1*rowSpace, td.Text, td.Color)
 		ti.addLine(colNo*columnSpace, 0, colNo*columnSpace, ti.height, "#000000")
@@ -22,7 +22,7 @@ func (ti *tableImage) drawTH() {
 
 }
 
-func (ti *tableImage) drawTR() {
+func (ti *TableImage) drawTR() {
 	fRowNo := 2
 	for _, tds := range ti.trs {
 		//start with the second row since the first one is the th
@@ -49,7 +49,7 @@ func (ti *tableImage) drawTR() {
 	}
 }
 
-func (ti *tableImage) calculateHeight() {
+func (ti *TableImage) calculateHeight() {
 	//start from 1 since we have th
 	totalRowNo := 1
 	for _, tr := range ti.trs {
@@ -66,13 +66,13 @@ func (ti *tableImage) calculateHeight() {
 	ti.height = totalRowNo*rowSpace + rowSpace - tablePadding + 5
 }
 
-func (ti *tableImage) calculateWidth() {
+func (ti *TableImage) calculateWidth() {
 	totalColumnNo := len(ti.th.Tds)
 
 	ti.width = totalColumnNo * columnSpace
 }
 
-func (ti *tableImage) saveFile() {
+func (ti *TableImage) saveFile() {
 	f, err := os.Create(ti.filePath)
 	if err != nil {
 		panic(err)
@@ -89,7 +89,7 @@ func (ti *tableImage) saveFile() {
 	}
 }
 
-func (ti *tableImage) get() *bytes.Buffer {
+func (ti *TableImage) get() *bytes.Buffer {
 	buffer := new(bytes.Buffer)
 	if ti.fileType == "jpg" {
 		if err := jpeg.Encode(buffer, ti.img, nil); err != nil {
