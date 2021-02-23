@@ -18,7 +18,7 @@ func main() {
 	configs := config.Get()
 
 	// query all users
-	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
+	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers)
 	cursor, err := userColl.Find(
 		context.Background(),
 		bson.M{},
@@ -28,7 +28,7 @@ func main() {
 	}
 	allUsers := []models.User{}
 	cursor.All(context.Background(), &allUsers)
-	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "stocks")
+	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks)
 
 	// stock map
 	stockMap := handlers.GetStockMap(stockColl)

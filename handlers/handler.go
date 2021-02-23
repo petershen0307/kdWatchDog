@@ -24,8 +24,8 @@ func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 			bot.SendAlbum(p.to, tg.Album{p.what.(*tg.Photo)})
 		}
 	}
-	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
-	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "stocks")
+	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers)
+	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks)
 	bot.Handle(getEchoHandler(responseCallback))
 	bot.Handle(getAddStockHandler(responseCallback, userColl))
 	bot.Handle(getListStockHandler(responseCallback, userColl))

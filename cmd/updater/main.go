@@ -17,7 +17,7 @@ import (
 func main() {
 	// query watched stocks
 	configs := config.Get()
-	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "users")
+	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers)
 	cursor, err := userColl.Find(
 		context.Background(),
 		bson.M{},
@@ -39,14 +39,14 @@ func main() {
 		}
 	}
 	// update to new stock to collection
-	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, "stocks")
+	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks)
 	for _, stock := range stockIDMap {
 		stockColl.UpdateOne(context.Background(),
 			bson.M{"stock_id": stock.ID},
 			bson.M{"$setOnInsert": stock},
 			options.Update().SetUpsert(true))
 	}
-	// query stock information last update time is greater than a day
+	// query stock information last update time is greater than one hour
 	cursor, err = stockColl.Find(context.Background(), bson.M{"last_update": bson.M{
 		"$lt": time.Now().UTC().Add(-1 * time.Hour),
 	}})

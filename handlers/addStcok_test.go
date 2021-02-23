@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/petershen0307/kdWatchDog/db"
 	"github.com/petershen0307/kdWatchDog/models"
 	"github.com/petershen0307/kdWatchDog/test"
 	"github.com/stretchr/testify/assert"
@@ -30,11 +31,11 @@ func (s *addHandleTestSuite) SetupSuite() {
 	var err error
 	s.client, err = test.InitDB()
 	assert.NoError(s.T(), err)
-	s.collection = test.GetCollection(s.client, "users")
+	s.collection = test.GetCollection(s.client, db.CollectionNameUsers)
 }
 
 func (s *addHandleTestSuite) TearDownSuite() {
-	assert.NoError(s.T(), test.Deinit(s.client, "users"))
+	assert.NoError(s.T(), test.Deinit(s.client, db.CollectionNameUsers))
 }
 
 func (s *addHandleTestSuite) TearDownTest() {

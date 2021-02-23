@@ -8,6 +8,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	// CollectionNameStocks is the collection name
+	CollectionNameStocks = "stocks"
+	// CollectionNameUsers is the collection name
+	CollectionNameUsers = "users"
+)
+
 // GetCollection to get mongoDB collection
 func GetCollection(mongoDBURI, dbName, collectionName string) *mongo.Collection {
 	// Set client options
