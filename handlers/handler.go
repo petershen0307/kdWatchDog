@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"context"
+
 	"github.com/petershen0307/kdWatchDog/config"
 	"github.com/petershen0307/kdWatchDog/db"
+	"go.mongodb.org/mongo-driver/mongo"
 	tg "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -26,8 +29,6 @@ func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
 	}
 	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers)
 	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks)
-	bot.Handle(getEchoHandler(responseCallback))
-	bot.Handle(getAddStockHandler(responseCallback, userColl))
 	bot.Handle(getListStockHandler(responseCallback, userColl))
 	bot.Handle(getDelStockHandler(responseCallback, userColl))
 	bot.Handle(getQueryStockHandler(responseCallback, userColl, stockColl, configs.ImgurClientID))
@@ -42,35 +43,76 @@ const TelegramBot BotPlatform = 1
 // Mail is the structure for handler and bot
 type Mail struct {
 	platform BotPlatform
-	fromID   interface{}
-	toID     interface{}
+	userID   int
+	fromUser interface{}
+	toUser   interface{}
 	fromMsg  string
 	toMsg    string
 }
 
 // Handler is the handler structure, communicate with postman
 type Handler struct {
-	mailBox chan Mail
+	mailbox   chan Mail
+	userColl  *mongo.Collection
+	stockColl *mongo.Collection
 }
 
-type handlerBroker struct {
-	handlerMap map[string]func(*Mail)
+func getHandlerMap(handler *Handler) map[string]func(*Mail) {
+	funcMap := map[string]func(*Mail){}
+	funcMap[echoCommand] = handler.echo
+	funcMap[addCommand] = handler.AddStock
+	return funcMap
 }
 
-func newHandlerBroker(handler *Handler) *handlerBroker {
-	broker := handlerBroker{}
-	broker.handlerMap[echoCommand] = handler.echo
-	return &broker
-}
-
-func tgHandlerCallback(broker *handlerBroker, command string, m *tg.Message) {
+func tgHandlerCallback(commandFunc func(*Mail), m *tg.Message) {
 	fromMail := &Mail{
 		platform: TelegramBot,
-		fromID:   m.Sender,
-		toID:     m.Sender,
-		fromMsg:  m.Text}
-	if command == tg.OnText {
-		// echo
-		broker.handlerMap[echoCommand](fromMail)
+		userID:   m.Sender.ID,
+		fromUser: m.Sender,
+		toUser:   m.Sender,
+		fromMsg:  m.Text,
+	}
+	commandFunc(fromMail)
+}
+
+// NewHandler create a handler
+func NewHandler(mailbox chan Mail, configs *config.Config) *Handler {
+	// for unit test without DB
+	if configs == nil {
+		return &Handler{
+			mailbox: mailbox,
+		}
+	}
+	return &Handler{
+		mailbox:   mailbox,
+		userColl:  db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers),
+		stockColl: db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks),
+	}
+}
+
+// RegisterTelegramBotHandlers register bot handers
+func RegisterTelegramBotHandlers(bot *tg.Bot, handler *Handler) {
+	funcMap := getHandlerMap(handler)
+	for k, v := range funcMap {
+		command := k
+		if k == echoCommand {
+			command = tg.OnText
+		}
+		bot.Handle(command, func(m *tg.Message) {
+			tgHandlerCallback(v, m)
+		})
+	}
+}
+
+// PostmanDeliver will response message to bot client
+func PostmanDeliver(ctx context.Context, bot *tg.Bot, mailbox chan Mail) {
+	for {
+		select {
+		case <-ctx.Done():
+		case mail := <-mailbox:
+			if mail.platform == TelegramBot {
+				bot.Send(mail.toUser.(tg.Recipient), mail.toMsg)
+			}
+		}
 	}
 }

@@ -9,19 +9,14 @@ import (
 
 	"github.com/petershen0307/kdWatchDog/bot"
 	"github.com/petershen0307/kdWatchDog/config"
+	"github.com/petershen0307/kdWatchDog/handlers"
 )
 
 func main() {
 	configs := config.Get()
-
-	tgBot := bot.New(*configs)
-
 	ctx, cancel := context.WithCancel(context.Background())
 	go gracefulShutdown(cancel)
-	go tgBot.Start()
-	// wait shutdown event
-	<-ctx.Done()
-	tgBot.Stop()
+	startBot(ctx, configs)
 }
 
 func gracefulShutdown(cancel context.CancelFunc) {
@@ -32,4 +27,15 @@ func gracefulShutdown(cancel context.CancelFunc) {
 		log.Println("Receive shutdown signal:", sig)
 		cancel()
 	}
+}
+
+func startBot(ctx context.Context, configs *config.Config) {
+	tgBot := bot.New(*configs)
+	mailbox := make(chan handlers.Mail, 10)
+	handlers.RegisterTelegramBotHandlers(tgBot, handlers.NewHandler(mailbox, configs))
+	go handlers.PostmanDeliver(ctx, tgBot, mailbox)
+	go tgBot.Start()
+	// wait shutdown event
+	<-ctx.Done()
+	tgBot.Stop()
 }
