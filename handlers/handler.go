@@ -64,15 +64,17 @@ func getHandlerMap(handler *Handler) map[string]func(*Mail) {
 	return funcMap
 }
 
-func tgHandlerCallback(commandFunc func(*Mail), m *tg.Message) {
-	fromMail := &Mail{
-		platform: TelegramBot,
-		userID:   m.Sender.ID,
-		fromUser: m.Sender,
-		toUser:   m.Sender,
-		fromMsg:  m.Text,
+func generateCallback(commandFunc func(*Mail)) func(m *tg.Message) {
+	return func(m *tg.Message) {
+		fromMail := &Mail{
+			platform: TelegramBot,
+			userID:   m.Sender.ID,
+			fromUser: m.Sender,
+			toUser:   m.Sender,
+			fromMsg:  m.Text,
+		}
+		commandFunc(fromMail)
 	}
-	commandFunc(fromMail)
 }
 
 // NewHandler create a handler
@@ -98,9 +100,7 @@ func RegisterTelegramBotHandlers(bot *tg.Bot, handler *Handler) {
 		if k == echoCommand {
 			command = tg.OnText
 		}
-		bot.Handle(command, func(m *tg.Message) {
-			tgHandlerCallback(v, m)
-		})
+		bot.Handle(command, generateCallback(v))
 	}
 }
 
