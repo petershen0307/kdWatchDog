@@ -109,9 +109,10 @@ func PostmanDeliver(ctx context.Context, bot *tg.Bot, mailbox chan Mail) {
 	for {
 		select {
 		case <-ctx.Done():
+			return
 		case mail := <-mailbox:
 			if mail.platform == TelegramBot {
-				bot.Send(mail.toUser.(tg.Recipient), mail.toMsg)
+				bot.Send(mail.toUser.(*tg.User), mail.toMsg)
 			}
 		}
 	}
