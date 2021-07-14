@@ -20,13 +20,13 @@ func main() {
 }
 
 func gracefulShutdown(cancel context.CancelFunc) {
+	defer cancel()
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGINT)
-	select {
-	case sig := <-sigs:
-		log.Println("Receive shutdown signal:", sig)
-		cancel()
-	}
+	// wait shutdown event
+	sig := <-sigs
+	log.Println("Receive shutdown signal:", sig)
+
 }
 
 func startBot(ctx context.Context, configs *config.Config) {
