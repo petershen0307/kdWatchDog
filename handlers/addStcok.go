@@ -68,5 +68,6 @@ func (handle *Handler) AddStock(mail *Mail) {
 			responseMail.toMsg = fmt.Sprintf("Add stock fail (%v)", err)
 		}
 	}
+	responseMail.toMsg = fmt.Sprintf("Add %v ok", stockID)
 	handle.mailbox <- responseMail
 }
