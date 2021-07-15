@@ -11,39 +11,9 @@ import (
 	tableimage "github.com/petershen0307/kdWatchDog/table-image"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/mgo.v2/bson"
-	tg "gopkg.in/tucnak/telebot.v2"
 )
 
 const queryCommand = "/query"
-
-func getQueryStockHandler(responseCallback responseCallbackFunc, userColl, stockColl *mongo.Collection, imgurClientID string) (string, func(*tg.Message)) {
-	return queryCommand, func(m *tg.Message) {
-		var p *post = &post{
-			to:      m.Sender,
-			what:    "no data",
-			options: []interface{}{},
-		}
-		defer responseCallback(p)
-
-		// query all user
-		var user models.User
-		if err := userColl.FindOne(context.Background(), bson.M{"user_id": m.Sender.ID}).Decode(&user); err != nil {
-			log.Printf("connect to db err=%v", err)
-			p.what = "connect user collection failed"
-			return
-		}
-
-		stockMap := GetStockMap(stockColl)
-		if stockMap == nil {
-			p.what = "connect user collection failed"
-			return
-		}
-		msg := RenderOneUserOutput(&user, stockMap)
-		// upload to imgur
-		link, _ := imgur.UploadImage(imgurClientID, msg.Bytes())
-		p.what = link
-	}
-}
 
 // GetStockMap create stock map cache
 func GetStockMap(stockColl *mongo.Collection) map[string]models.StockInfo {
@@ -142,4 +112,28 @@ func getTDByKDValue(kdValueStr string) tableimage.TD {
 		color = "#ff0000"
 	}
 	return tableimage.TD{Color: color, Text: kdValueStr}
+}
+
+// QueryStock handle query command
+func (handle *Handler) QueryStock(mail *Mail) {
+	defer func() {
+		handle.mailbox <- *mail
+	}()
+	// query all user
+	var user models.User
+	if err := handle.userColl.FindOne(context.Background(), bson.M{"user_id": mail.userID}).Decode(&user); err != nil {
+		log.Printf("connect to db err=%v", err)
+		mail.toMsg = "connect user collection failed"
+		return
+	}
+
+	stockMap := GetStockMap(handle.stockColl)
+	if stockMap == nil {
+		mail.toMsg = "connect user collection failed"
+		return
+	}
+	msg := RenderOneUserOutput(&user, stockMap)
+	// upload to imgur
+	link, _ := imgur.UploadImage(handle.imgurClientID, msg.Bytes())
+	mail.toMsg = link
 }

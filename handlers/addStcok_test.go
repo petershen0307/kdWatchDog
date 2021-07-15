@@ -50,10 +50,10 @@ func (s *addHandleTestSuite) Test_getAddStockHandler_oneData() {
 	userID := 5566
 
 	// act
-	s.handle.AddStock(&Mail{fromMsg: stockID, userID: userID})
-
+	s.handle.AddStock(&Mail{platform: TelegramBot, fromMsg: fmt.Sprintf("/add %v", stockID), userID: userID})
+	gotValue := <-s.handle.mailbox
 	// assert
-	assert.Equal(s.T(), fmt.Sprintf("add %v ok", stockID), <-s.handle.mailbox)
+	assert.Equal(s.T(), fmt.Sprintf("add %v ok", stockID), gotValue.toMsg)
 }
 
 func (s *addHandleTestSuite) Test_getAddStockHandler_sameUserSecondData() {
@@ -70,10 +70,10 @@ func (s *addHandleTestSuite) Test_getAddStockHandler_sameUserSecondData() {
 	assert.NoError(s.T(), err)
 
 	// act
-	s.handle.AddStock(&Mail{fromMsg: stockID, userID: userID})
-
+	s.handle.AddStock(&Mail{platform: TelegramBot, fromMsg: stockID, userID: userID})
+	gotValue := <-s.handle.mailbox
 	// assert
-	assert.Equal(s.T(), fmt.Sprintf("add %v ok", stockID), <-s.handle.mailbox)
+	assert.Equal(s.T(), fmt.Sprintf("add %v ok", stockID), gotValue.toMsg)
 }
 
 func (s *addHandleTestSuite) Test_getAddStockHandler_invalidStockID() {
@@ -82,8 +82,8 @@ func (s *addHandleTestSuite) Test_getAddStockHandler_invalidStockID() {
 	userID := 5566
 
 	// act
-	s.handle.AddStock(&Mail{fromMsg: stockID, userID: userID})
-
+	s.handle.AddStock(&Mail{fromMsg: stockID, userID: userID, platform: TelegramBot})
+	gotValue := <-s.handle.mailbox
 	// assert
-	assert.Equal(s.T(), "invalid stock id", <-s.handle.mailbox)
+	assert.Equal(s.T(), "invalid stock id", gotValue.toMsg)
 }

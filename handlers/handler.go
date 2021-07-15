@@ -17,23 +17,6 @@ type post struct {
 	options []interface{}
 }
 
-// RegisterHandlers register bot handers
-func RegisterHandlers(bot *tg.Bot, configs *config.Config) {
-	responseCallback := func(p *post) {
-		switch p.what.(type) {
-		case string:
-			bot.Send(p.to, p.what, p.options...)
-		case *tg.Photo:
-			bot.SendAlbum(p.to, tg.Album{p.what.(*tg.Photo)})
-		}
-	}
-	userColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers)
-	stockColl := db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks)
-	bot.Handle(getListStockHandler(responseCallback, userColl))
-	bot.Handle(getDelStockHandler(responseCallback, userColl))
-	bot.Handle(getQueryStockHandler(responseCallback, userColl, stockColl, configs.ImgurClientID))
-}
-
 // defined bot platform
 type BotPlatform int
 
@@ -52,15 +35,17 @@ type Mail struct {
 
 // Handler is the handler structure, communicate with postman
 type Handler struct {
-	mailbox   chan Mail
-	userColl  *mongo.Collection
-	stockColl *mongo.Collection
+	mailbox       chan Mail
+	userColl      *mongo.Collection
+	stockColl     *mongo.Collection
+	imgurClientID string
 }
 
 func getHandlerMap(handler *Handler) map[string]func(*Mail) {
 	funcMap := map[string]func(*Mail){}
 	funcMap[echoCommand] = handler.echo
 	funcMap[addCommand] = handler.AddStock
+	funcMap[delCommand] = handler.DelStock
 	return funcMap
 }
 
@@ -86,9 +71,10 @@ func NewHandler(mailbox chan Mail, configs *config.Config) *Handler {
 		}
 	}
 	return &Handler{
-		mailbox:   mailbox,
-		userColl:  db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers),
-		stockColl: db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks),
+		mailbox:       mailbox,
+		userColl:      db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameUsers),
+		stockColl:     db.GetCollection(configs.MongoDBURI, configs.DBName, db.CollectionNameStocks),
+		imgurClientID: configs.ImgurClientID,
 	}
 }
 

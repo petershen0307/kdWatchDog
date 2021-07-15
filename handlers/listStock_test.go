@@ -14,7 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
-	tg "gopkg.in/tucnak/telebot.v2"
 )
 
 func TestListStockIDSuite(t *testing.T) {
@@ -24,15 +23,18 @@ func TestListStockIDSuite(t *testing.T) {
 
 type listHandleTestSuite struct {
 	suite.Suite
-	client     *mongo.Client
-	collection *mongo.Collection
+	client *mongo.Client
+	handle *Handler
 }
 
 func (s *listHandleTestSuite) SetupSuite() {
 	var err error
 	s.client, err = test.InitDB()
 	assert.NoError(s.T(), err)
-	s.collection = test.GetCollection(s.client, db.CollectionNameUsers)
+	s.handle = &Handler{
+		userColl: test.GetCollection(s.client, db.CollectionNameUsers),
+		mailbox:  make(chan Mail, 10),
+	}
 }
 
 func (s *listHandleTestSuite) TearDownSuite() {
@@ -40,41 +42,27 @@ func (s *listHandleTestSuite) TearDownSuite() {
 }
 
 func (s *listHandleTestSuite) TearDownTest() {
-	assert.NoError(s.T(), test.RemoveDocs(s.collection))
+	assert.NoError(s.T(), test.RemoveDocs(s.handle.userColl))
 }
 
 func (s *listHandleTestSuite) Test_getListStockHandler_noData() {
 	// arrange
-	gotValue := ""
-	responseCallback := func(p *post) {
-		gotValue = p.what.(string)
-	}
 	userID := 5566
 
 	// act
-	command, f := getListStockHandler(responseCallback, s.collection)
-	f(&tg.Message{
-		Sender: &tg.User{
-			ID: userID,
-		},
-	})
-
+	s.handle.ListStock(&Mail{userID: userID, platform: TelegramBot})
+	gotValue := <-s.handle.mailbox
 	// assert
-	assert.Equal(s.T(), listCommand, command)
-	assert.Equal(s.T(), gotValue, "no data")
+	assert.Equal(s.T(), "no data", gotValue.toMsg)
 }
 
 func (s *listHandleTestSuite) Test_getListStockHandler_expectStockList() {
 	// arrange
-	gotValue := ""
-	responseCallback := func(p *post) {
-		gotValue = p.what.(string)
-	}
 	mockUser := models.User{
 		UserID: 7788,
 		Stocks: []string{"2330", "1101", "aapl"},
 	}
-	_, err := s.collection.UpdateOne(context.Background(), bson.M{"user_id": mockUser.UserID},
+	_, err := s.handle.userColl.UpdateOne(context.Background(), bson.M{"user_id": mockUser.UserID},
 		bson.M{
 			"$set": mockUser,
 		}, options.Update().SetUpsert(true))
@@ -82,14 +70,10 @@ func (s *listHandleTestSuite) Test_getListStockHandler_expectStockList() {
 	sort.Strings(mockUser.Stocks)
 
 	// act
-	command, f := getListStockHandler(responseCallback, s.collection)
-	f(&tg.Message{
-		Sender: &tg.User{
-			ID: mockUser.UserID,
-		},
-	})
+
+	s.handle.ListStock(&Mail{userID: mockUser.UserID, platform: TelegramBot})
+	gotValue := <-s.handle.mailbox
 
 	// assert
-	assert.Equal(s.T(), listCommand, command)
-	assert.Equal(s.T(), strings.Join(mockUser.Stocks, "\n"), gotValue)
+	assert.Equal(s.T(), strings.Join(mockUser.Stocks, "\n"), gotValue.toMsg)
 }
