@@ -121,7 +121,7 @@ func (handle *Handler) QueryStock(mail *Mail) {
 	}()
 	// query all user
 	var user models.User
-	if err := handle.userColl.FindOne(context.Background(), bson.M{"user_id": mail.userID}).Decode(&user); err != nil {
+	if err := handle.userColl.FindOne(context.Background(), bson.M{"user_id": mail.userID, "bot_platform": mail.platform}).Decode(&user); err != nil {
 		log.Printf("connect to db err=%v", err)
 		mail.toMsg = "connect user collection failed"
 		return

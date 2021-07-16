@@ -21,7 +21,7 @@ func (handle *Handler) ListStock(mail *Mail) {
 	queryUser := models.User{}
 	err := handle.userColl.FindOne(
 		context.Background(),
-		bson.M{"user_id": mail.userID},
+		bson.M{"user_id": mail.userID, "bot_platform": mail.platform},
 	).Decode(&queryUser)
 	if err == mongo.ErrNoDocuments {
 		return

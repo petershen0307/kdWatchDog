@@ -19,6 +19,7 @@ const delCommand = "/del"
 func (handle *Handler) DelStock(mail *Mail) {
 	stockID := strings.Replace(mail.fromMsg, delCommand, "", 1)
 	stockID = strings.TrimSpace(stockID)
+	stockID = strings.ToUpper(stockID)
 	defer func() {
 		handle.mailbox <- *mail
 	}()
@@ -49,7 +50,7 @@ func (handle *Handler) DelStock(mail *Mail) {
 		queryUser.Stocks = append(queryUser.Stocks[0:removeIndex], queryUser.Stocks[removeIndex+1:]...)
 	}
 	queryUser.LastUpdate = time.Now().UTC()
-	_, err = handle.userColl.UpdateOne(context.Background(), bson.M{"user_id": mail.userID}, bson.M{"$set": queryUser},
+	_, err = handle.userColl.UpdateOne(context.Background(), bson.M{"user_id": mail.userID, "bot_platform": mail.platform}, bson.M{"$set": queryUser},
 		options.Update().SetUpsert(true))
 	if err != nil {
 		mail.toMsg = fmt.Sprintf("Delete stock(%v) fail (%v)", stockID, err)
