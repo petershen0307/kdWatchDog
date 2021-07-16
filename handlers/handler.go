@@ -46,6 +46,8 @@ func getHandlerMap(handler *Handler) map[string]func(*Mail) {
 	funcMap[echoCommand] = handler.echo
 	funcMap[addCommand] = handler.AddStock
 	funcMap[delCommand] = handler.DelStock
+	funcMap[listCommand] = handler.ListStock
+	funcMap[queryCommand] = handler.QueryStock
 	return funcMap
 }
 
