@@ -70,6 +70,12 @@ func main() {
 	}
 	// update to DB
 	for _, stock := range allStock {
+		if stock.DailyKD == (models.STOCH{}) &&
+			stock.DailyPrice == (models.Price{}) &&
+			stock.MonthlyKD == (models.STOCH{}) &&
+			stock.WeeklyKD == (models.STOCH{}) {
+			continue
+		}
 		stockColl.UpdateOne(context.Background(),
 			bson.M{"stock_id": stock.ID},
 			bson.M{"$set": stock},
