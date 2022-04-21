@@ -1,5 +1,7 @@
 # kdWatchDog
 
+[![build-ci](https://github.com/petershen0307/kdWatchDog/actions/workflows/build_ci.yml/badge.svg)](https://github.com/petershen0307/kdWatchDog/actions/workflows/build_ci.yml)
+
 ## command
 
 - /list
