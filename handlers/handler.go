@@ -55,7 +55,7 @@ func generateCallback(commandFunc func(*Mail)) func(m *tg.Message) {
 	return func(m *tg.Message) {
 		fromMail := &Mail{
 			platform: TelegramBot,
-			userID:   m.Sender.ID,
+			userID:   int(m.Sender.ID),
 			fromUser: m.Sender,
 			toUser:   m.Sender,
 			fromMsg:  m.Text,

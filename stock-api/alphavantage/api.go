@@ -14,7 +14,11 @@ import (
 	stockapi "github.com/petershen0307/kdWatchDog/stock-api"
 )
 
-const baseURL = "https://www.alphavantage.co/query?"
+const (
+	baseURL           = "https://www.alphavantage.co/query?"
+	OutputsizeFull    = "full"
+	OutputsizeCompact = "compact"
+)
 
 // API integrate alphavantage API
 type API struct {
@@ -120,46 +124,57 @@ func (a *API) GetSTOCH(symbol string, interval stockapi.ResolutionInterval, fast
 	return models.STOCH{}
 }
 
-func (a *API) getPrice(symbol, priceFunction string, decoder func(map[string]interface{}) interface{}) models.Price {
+func (a *API) getPrice(symbol, priceFunction, outputsize string, decoder func(map[string]interface{}) interface{}) interface{} {
 	//https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=IBM&apikey=demo
 	apiArgs := url.Values{
-		"function": []string{priceFunction},
-		"symbol":   []string{strings.ToUpper(symbol)},
-		"datatype": []string{"json"},
-		"apikey":   []string{a.key},
+		"function":   []string{priceFunction},
+		"symbol":     []string{strings.ToUpper(symbol)},
+		"datatype":   []string{"json"},
+		"apikey":     []string{a.key},
+		"outputsize": []string{outputsize},
 	}
 	requestURL := baseURL + apiArgs.Encode()
 	log.Printf("alphavantage request url=%v", requestURL)
 	result := a.requestAPI(apiArgs, decoder)
-	if price, ok := result.(models.Price); ok {
-		return price
-	}
-	return models.Price{}
+	return result
 }
 
 // GetDailyPrice daily price
 func (a *API) GetDailyPrice(symbol string) models.Price {
-	r := a.getPrice(symbol, "TIME_SERIES_DAILY", func(jsonMap map[string]interface{}) interface{} {
-		lastDate := ""
+	data, lastDate := a.GetDailyPriceEx(symbol, OutputsizeCompact)
+	return data[lastDate]
+}
+
+// GetDailyPriceEx daily price
+func (a *API) GetDailyPriceEx(symbol, outputsize string) (map[string]models.Price, string) {
+	lastDate := ""
+	r := a.getPrice(symbol, "TIME_SERIES_DAILY", outputsize, func(jsonMap map[string]interface{}) interface{} {
 		if jMap, ok := jsonMap["Meta Data"].(map[string]interface{}); ok {
 			lastDate = jMap["3. Last Refreshed"].(string)
 		}
+		prices := make(map[string]models.Price)
 		if jMap, ok := jsonMap["Time Series (Daily)"].(map[string]interface{}); ok {
-			return models.Price{
-				Open:  jMap[lastDate].(map[string]interface{})["1. open"].(string),
-				High:  jMap[lastDate].(map[string]interface{})["2. high"].(string),
-				Low:   jMap[lastDate].(map[string]interface{})["3. low"].(string),
-				Close: jMap[lastDate].(map[string]interface{})["4. close"].(string),
+			for key, val := range jMap {
+				prices[key] = models.Price{
+					Open:  val.(map[string]interface{})["1. open"].(string),
+					High:  val.(map[string]interface{})["2. high"].(string),
+					Low:   val.(map[string]interface{})["3. low"].(string),
+					Close: val.(map[string]interface{})["4. close"].(string),
+				}
 			}
 		}
-		return models.Price{}
+		return prices
 	})
-	return r
+
+	if prices, ok := r.(map[string]models.Price); ok {
+		return prices, lastDate
+	}
+	return nil, lastDate
 }
 
 // GetWeeklyPrice weekly price
 func (a *API) GetWeeklyPrice(symbol string) models.Price {
-	r := a.getPrice(symbol, "TIME_SERIES_WEEKLY", func(jsonMap map[string]interface{}) interface{} {
+	r := a.getPrice(symbol, "TIME_SERIES_WEEKLY", OutputsizeCompact, func(jsonMap map[string]interface{}) interface{} {
 		lastDate := ""
 		if jMap, ok := jsonMap["Meta Data"].(map[string]interface{}); ok {
 			lastDate = jMap["3. Last Refreshed"].(string)
@@ -174,12 +189,16 @@ func (a *API) GetWeeklyPrice(symbol string) models.Price {
 		}
 		return models.Price{}
 	})
-	return r
+
+	if price, ok := r.(models.Price); ok {
+		return price
+	}
+	return models.Price{}
 }
 
 // GetMonthlyPrice monthly price
 func (a *API) GetMonthlyPrice(symbol string) models.Price {
-	r := a.getPrice(symbol, "TIME_SERIES_MONTHLY", func(jsonMap map[string]interface{}) interface{} {
+	r := a.getPrice(symbol, "TIME_SERIES_MONTHLY", OutputsizeCompact, func(jsonMap map[string]interface{}) interface{} {
 		lastDate := ""
 		if jMap, ok := jsonMap["Meta Data"].(map[string]interface{}); ok {
 			lastDate = jMap["3. Last Refreshed"].(string)
@@ -194,5 +213,9 @@ func (a *API) GetMonthlyPrice(symbol string) models.Price {
 		}
 		return models.Price{}
 	})
-	return r
+
+	if price, ok := r.(models.Price); ok {
+		return price
+	}
+	return models.Price{}
 }

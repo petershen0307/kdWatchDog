@@ -40,6 +40,6 @@ func main() {
 		if err != nil {
 			log.Fatalf("upload image with error=%v", err)
 		}
-		bot.Send(&tg.User{ID: user.UserID}, link)
+		bot.Send(&tg.User{ID: int64(user.UserID)}, link)
 	}
 }
